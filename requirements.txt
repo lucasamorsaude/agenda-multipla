@@ -1,7 +1,5 @@
 requests
-json
-os
-flask
+Flask
 datetime
 pandas
 gunicorn
