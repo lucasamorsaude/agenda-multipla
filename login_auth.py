@@ -3,7 +3,6 @@
 import requests
 import json
 import os
-import streamlit as st
 
 # 1. Definições da Requisição
 LOGIN_URL = 'https://amei.amorsaude.com.br/api/v1/security/login'

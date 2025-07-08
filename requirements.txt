@@ -1,0 +1,7 @@
+requests
+json
+os
+flask
+datetime
+pandas
+gunicorn
