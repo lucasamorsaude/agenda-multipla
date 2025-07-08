@@ -1,0 +1,374 @@
+/* Variáveis CSS para o Tema Escuro */
+:root {
+    --bg-primary: #1a1a1a; /* Fundo principal escuro */
+    --bg-secondary: #2c2c2c; /* Fundo de elementos secundários (cards, abas) */
+    --text-color: #e0e0e0; /* Cor do texto principal (claro) */
+    --text-secondary: #b0b0b0; /* Cor do texto secundário/subtítulos */
+    --header-bg: #121212; /* Fundo do cabeçalho bem escuro */
+    --header-text: #ffffff; /* Texto do cabeçalho branco */
+    --border-color: #444444; /* Cor de bordas e divisores */
+    --shadow-color: rgba(0, 0, 0, 0.4); /* Cor das sombras escuras */
+    --accent-color: #007bff; /* Cor de destaque (azul) */
+    --accent-color-hover: #0056b3; /* Cor de destaque hover */
+    --button-info-bg: #3f51b5; /* Azul mais escuro para botões info */
+    --button-info-hover-bg: #303f9f;
+    --table-header-bg: #333333; /* Fundo do cabeçalho da tabela */
+    --table-stripe-bg: #222222; /* Cor da faixa da tabela */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-primary); /* Usa variável de fundo principal */
+    color: var(--text-color); /* Usa variável de cor de texto */
+}
+
+header {
+    background-color: var(--header-bg); /* Usa variável de fundo do cabeçalho */
+    color: var(--header-text); /* Usa variável de cor de texto do cabeçalho */
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+header h1, header p {
+    color: var(--header-text);
+}
+
+.container-fluid {
+    padding-top: 20px;
+}
+
+h1, h3 {
+    color: var(--accent-color); /* H1 e H3 podem ser da cor de destaque */
+    font-weight: 600;
+}
+
+h3 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+h3 a:hover {
+    text-decoration: underline;
+    color: var(--accent-color-hover);
+}
+
+.form-inline .form-control {
+    border-radius: 0.25rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary); /* Fundo dos inputs */
+    color: var(--text-color); /* Texto dos inputs */
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    transition: background-color 0.3s ease;
+    color: white; /* Garante texto branco */
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-color-hover);
+    border-color: var(--accent-color-hover);
+}
+
+.btn-info {
+    background-color: var(--button-info-bg);
+    border-color: var(--button-info-bg);
+    transition: background-color 0.3s ease;
+    color: white; /* Garante texto branco */
+}
+
+.btn-info:hover {
+    background-color: var(--button-info-hover-bg);
+    border-color: var(--button-info-hover-bg);
+}
+
+/* Linha que contém as colunas dos profissionais - remover margens negativas e centralizar*/
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* Estilos para as colunas de profissionais */
+.professional-column {
+    background-color: var(--bg-secondary); /* Fundo dos cards de profissional */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px var(--shadow-color); /* Sombra mais escura */
+    margin: 5px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    flex-grow: 1;
+    flex-basis: 0;
+    min-width: 150px;
+    max-width: 250px;
+
+    width: calc(16.66% - 10px);
+    @media (max-width: 768px) {
+        width: calc(33.33% - 10px);
+    }
+    @media (max-width: 576px) {
+        width: calc(50% - 10px);
+    }
+     @media (max-width: 400px) {
+        width: calc(100% - 10px);
+    }
+}
+
+.professional-column h3 {
+    color: var(--header-text); /* Texto do nome do profissional branco */
+    background-color: var(--header-bg); /* Fundo do cabeçalho do profissional (igual ao header geral) */
+    width: 100%;
+    margin: 0;
+    padding: 10px 0;
+    border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
+    font-size: 1.2em;
+}
+
+.professional-column h3 a {
+    color: inherit;
+}
+
+/* Conteúdo dos cards do profissional (onde ficam os slots) */
+.professional-column .slot-content-wrapper {
+    padding: 15px 10px;
+    width: 100%;
+}
+
+
+/* Slot cards */
+.slot-card {
+    border-radius: 6px;
+    padding: 8px 5px;
+    margin: 4px 0;
+    text-align: center;
+    font-size: 14px;
+    height: 75px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: none;
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Borda clara para contraste */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    overflow: hidden;
+}
+
+.slot-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.slot-card strong {
+    font-size: 1em;
+    margin-bottom: 2px;
+}
+
+/* Ajuste específico para o nome do paciente dentro do slot card */
+.slot-card span {
+    font-size: 0.75em;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    display: block;
+    color: var(--text-color); /* Texto do paciente claro */
+}
+
+
+/* Tabela de resumo */
+.table-responsive {
+    margin-top: 20px;
+}
+
+.table.table-striped {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: var(--text-color); /* Texto da tabela claro */
+    border-collapse: collapse;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.table.table-striped th,
+.table.table-striped td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid var(--border-color); /* Borda da tabela escura */
+}
+
+.table.table-striped th {
+    background-color: var(--table-header-bg); /* Fundo do cabeçalho da tabela */
+    font-weight: bold;
+    color: var(--header-text); /* Texto do cabeçalho da tabela branco */
+    text-align: center;
+}
+
+.table.table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--table-stripe-bg); /* Faixa da tabela escura */
+}
+.table.table-striped tbody tr:nth-of-type(even) { /* Adicionado para linhas pares */
+    background-color: var(--bg-secondary);
+}
+
+
+.table-responsive table tbody tr:last-child {
+    background-color: var(--accent-color) !important; /* Total Agendado com cor de destaque */
+    color: white;
+    font-weight: bold;
+}
+
+/* Abas */
+.nav-tabs .nav-link {
+    color: var(--text-secondary); /* Cor normal da aba (mais suave) */
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    background-color: var(--bg-secondary); /* Fundo das abas */
+    border: 1px solid var(--border-color); /* Borda da aba */
+    border-bottom: none; /* Remove a borda inferior para se juntar ao conteúdo */
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--accent-color); /* Cor de destaque para aba ativa */
+    background-color: var(--bg-primary); /* Fundo da aba ativa (igual ao body) */
+    border-color: var(--border-color);
+    border-bottom-color: var(--bg-primary); /* Cor da borda inferior igual ao fundo para "sumir" */
+}
+
+.tab-content {
+    background-color: var(--bg-primary); /* Fundo do conteúdo da aba */
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+.tab-content h5 {
+    color: var(--accent-color); /* Títulos dentro das abas */
+}
+
+.tab-content p strong {
+    color: var(--text-color);
+}
+.tab-content p {
+    color: var(--text-secondary);
+}
+
+
+/* Barras de progresso */
+.progress-bar-container {
+    background-color: var(--border-color); /* Fundo da barra de progresso */
+    border-radius: 5px;
+    height: 25px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 5px;
+    text-align: center;
+    color: white;
+    line-height: 25px;
+    font-size: 0.9em;
+    transition: width 0.5s ease-in-out;
+}
+
+/* Estilo para o spinner/loading */
+#loading-overlay {
+    display: none !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* Fundo mais escuro para o loading */
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+}
+#loading-overlay .spinner-border {
+    color: var(--accent-color); /* Spinner com cor de destaque */
+}
+#loading-overlay #loading-message {
+    color: var(--text-color); /* Mensagem de loading clara */
+}
+
+/* Novo CSS para o Modal de Detalhes Personalizado */
+#custom-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8); /* Fundo do modal bem escuro */
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+}
+
+#custom-modal-box {
+    background-color: var(--bg-secondary); /* Fundo do box do modal */
+    border-radius: 8px;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    padding: 25px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    animation: fadeIn 0.3s ease-out;
+}
+
+#custom-modal-header {
+    border-bottom: 1px solid var(--border-color); /* Borda do cabeçalho do modal */
+}
+
+#custom-modal-title {
+    color: var(--accent-color); /* Título do modal com cor de destaque */
+}
+
+#custom-modal-close-button {
+    color: var(--text-secondary); /* Cor do X no modal */
+}
+#custom-modal-close-button:hover {
+    color: var(--text-color);
+}
+
+#custom-modal-body p {
+    color: var(--text-secondary); /* Texto do corpo do modal */
+}
+
+#custom-modal-body p strong {
+    color: var(--text-color); /* Labels fortes no modal */
+}
+
+#custom-modal-body hr { /* Separador no modal */
+    border-top: 1px solid var(--border-color);
+}
+
+
+/* Ajuste no slot-card para dar um feedback visual de clicável */
+.slot-card.appointment-slot {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.slot-card.appointment-slot:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px var(--shadow-color);
+}

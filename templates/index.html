@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Múltipla</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {# Removido o bloco <style> inline para o loading-overlay daqui #}
+</head>
+<body>
+    {# Removido o script inline do topo do body #}
+
+    <header>
+        <h1 class="my-0">📅 Agenda Múltipla</h1>
+        <p class="mb-0">Visualize todos os horários (livres, agendados, etc.) lado a lado. <strong>Clique no nome do profissional para abrir no sistema Amei.</strong></p>
+    </header>
+
+    <div class="container-fluid">
+        <form id="agenda-form" method="POST" class="form-inline mb-4 mt-3">
+            <label for="selected_date" class="mr-2">Selecione a data:</label>
+            <input type="date" id="selected_date" name="selected_date" class="form-control mr-2" value="{{ selected_date }}">
+            <button type="submit" class="btn btn-primary" id="search-button">Buscar Agendas</button>
+        </form>
+
+        {# Overlay de Carregamento para a busca (Este deve estar com display:none no CSS por padrão) #}
+        <div id="loading-overlay">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Carregando...</span>
+            </div>
+            <p id="loading-message">Buscando agendas...</p>
+        </div>
+
+        {% if agendas %}
+            <div class="mb-4">
+                <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseResumo" aria-expanded="false" aria-controls="collapseResumo">
+                    📊 Ver Resumo Geral das Agendas
+                </button>
+                <div class="collapse mt-3" id="collapseResumo">
+                    <h4>Resumo Geral das Agendas</h4>
+                    <div class="table-responsive">
+                        {{ df_resumo_html | safe }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseStats" aria-expanded="false" aria-controls="collapseStats">
+                    📊 Confirmação Geral de Agendamentos e Ocupação
+                </button>
+                <div class="collapse mt-3" id="collapseStats">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="total-confirm-tab" data-toggle="tab" href="#total-confirm" role="tab" aria-controls="total-confirm" aria-selected="true">Confirmação Total</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="prof-confirm-tab" data-toggle="tab" href="#prof-confirm" role="tab" aria-controls="prof-confirm" aria-selected="false">Confirmação por Profissional</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="total-occupancy-tab" data-toggle="tab" href="#total-occupancy" role="tab" aria-controls="total-occupancy" aria-selected="false">Taxa de Ocupação Total</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="prof-occupancy-tab" data-toggle="tab" href="#prof-occupancy" role="tab" aria-controls="prof-occupancy" aria-selected="false">Taxa de Ocupação por Profissional</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="total-confirm" role="tabpanel" aria-labelledby="total-confirm-tab">
+                            <h5 class="mt-3">Visão Geral de Confirmação</h5>
+                            {% if total_agendado_geral > 0 %}
+                                <p><strong>Total de Agendados:</strong> {{ total_agendado_geral }}</p>
+                                <p><strong>Total de Confirmados:</strong> {{ total_confirmado_geral }}</p>
+                                <p><strong>Percentual de Confirmação:</strong> {{ percentual_confirmacao }}%</p>
+                                <div class="progress-bar-container">
+                                    {% set confirm_color = '#FF4B4B' if percentual_confirmacao | float < 60 else ('#FFA500' if percentual_confirmacao | float < 80 else '#4CAF50') %}
+                                    <div class="progress-bar-fill" style="width: {{ percentual_confirmacao }}%; background-color: {{ confirm_color }};"></div>
+                                </div>
+                            {% else %}
+                                <p class="text-info">Não há agendamentos válidos (exceto Livre/Bloqueado) para calcular a porcentagem de confirmação.</p>
+                            {% endif %}
+                        </div>
+                        <div class="tab-pane fade" id="prof-confirm" role="tabpanel" aria-labelledby="prof-confirm-tab">
+                            <h5 class="mt-3">Confirmação por Profissional</h5>
+                            {% if profissionais_stats_confirmacao %}
+                                {% for prof_stats in profissionais_stats_confirmacao %}
+                                    <p class="mt-3"><strong>{{ prof_stats.nome }}</strong></p>
+                                    <p>Total Agendado: {{ prof_stats.agendados }}, Confirmados: {{ prof_stats.confirmados }}</p>
+                                    <p>Percentual de Confirmação: {{ prof_stats.percentual }}%</p>
+                                    <div class="progress-bar-container">
+                                        {% set percentual_prof = prof_stats.percentual | float %}
+                                        {% set prof_confirm_color = '#FF4B4B' if percentual_prof < 60 else ('#FFA500' if percentual_prof < 80 else '#4CAF50') %}
+                                        <div class="progress-bar-fill" style="width: {{ percentual_prof }}%; background-color: {{ prof_confirm_color }};"></div>
+                                    </div>
+                                    <hr>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-info">Nenhum dado de confirmação por profissional disponível.</p>
+                            {% endif %}
+                        </div>
+                        <div class="tab-pane fade" id="total-occupancy" role="tabpanel" aria-labelledby="total-occupancy-tab">
+                            <h5 class="mt-3">Taxa de Ocupação Geral</h5>
+                            {% if total_slots_disponiveis > 0 %}
+                                <p><strong>Total de Horários Ocupados:</strong> {{ total_ocupados }}</p>
+                                <p><strong>Total de Slots Disponíveis:</strong> {{ total_slots_disponiveis }}</p>
+                                <p><strong>Taxa de Ocupação:</strong> {{ percentual_ocupacao }}%</p>
+                                <div class="progress-bar-container">
+                                    {% set occupancy_color = '#FF4B4B' if percentual_ocupacao | float < 60 else ('#FFA500' if percentual_ocupacao | float < 80 else '#4CAF50') %}
+                                    <div class="progress-bar-fill" style="width: {{ percentual_ocupacao }}%; background-color: {{ occupancy_color }};"></div>
+                                </div>
+                            {% else %}
+                                <p class="text-info">Não há slots disponíveis para calcular a taxa de ocupação.</p>
+                            {% endif %}
+                        </div>
+                        <div class="tab-pane fade" id="prof-occupancy" role="tabpanel" aria-labelledby="prof-occupancy-tab">
+                            <h5 class="mt-3">Taxa de Ocupação por Profissional</h5>
+                            {% if profissionais_stats_ocupacao %}
+                                {% for prof_stats in profissionais_stats_ocupacao %}
+                                    <p class="mt-3"><strong>{{ prof_stats.nome }}</strong></p>
+                                    <p>Horários Ocupados: {{ prof_stats.ocupados }}, Total de Slots: {{ prof_stats.total_slots }}</p>
+                                    <p>Taxa de Ocupação: {{ prof_stats.percentual }}%</p>
+                                    <div class="progress-bar-container">
+                                        {% set percentual_prof = prof_stats.percentual | float %}
+                                        {% set prof_occupancy_color = '#FF4B4B' if percentual_prof < 60 else ('#FFA500' if percentual_prof < 80 else '#4CAF50') %}
+                                        <div class="progress-bar-fill" style="width: {{ percentual_prof }}%; background-color: {{ prof_occupancy_color }};"></div>
+                                    </div>
+                                    <hr>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-info">Nenhum dado de ocupação por profissional disponível.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                {% for nome, agenda_data in agendas.items() %}
+                    <div class="professional-column">
+                        <h3>
+                            <a href="{{ agenda_url_template.format(agenda_data['id'], selected_date) }}" target="_blank">
+                                {{ nome }}
+                            </a>
+                        </h3>
+                        <div class="slot-content-wrapper">
+                            {% for slot in agenda_data['horarios'] %}
+                                {% set estilo_div = status_styles.get(slot['status'], slot.get('appointmentStatus', 'default')) %} {# Usando appointmentStatus se status for indefinido #}
+                                {% if slot['paciente'] %}
+                                    <div class="slot-card appointment-slot" style="{{ estilo_div }}"
+                                         data-slot-details="{{ slot | tojson | forceescape }}">
+                                        <strong>{{ slot['horario'] }}</strong>
+                                        <br><span style="color: #424242; font-size: 12px; font-weight: 500;">
+                                            {{ slot['paciente'][:20] ~ '...' if slot['paciente']|length > 20 else slot['paciente'] }}
+                                        </span>
+                                    </div>
+                                {% else %}
+                                    <div class="slot-card" style="{{ estilo_div }}">
+                                        <strong>{{ slot['horario'] }}</strong>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info mt-3" role="alert">
+                Selecione uma data e clique em "Buscar Agendas" para visualizar as informações.
+            </div>
+        {% endif %}
+    </div>
+
+    <div id="custom-modal-overlay">
+        <div id="custom-modal-box">
+            <div id="custom-modal-header">
+                <span id="custom-modal-title">Detalhes do Agendamento</span>
+                <button id="custom-modal-close-button">&times;</button>
+            </div>
+            <div id="custom-modal-body">
+                <p><strong>Paciente:</strong> <span id="modalPatient"></span></p>
+                <p><strong>CPF:</strong> <span id="modalPatientCpf"></span></p>
+                <p><strong>Celular:</strong> <span id="modalPatientPhone"></span></p>
+                <p><strong>Email:</strong> <span id="modalPatientEmail"></span></p>
+                <p><strong>Endereço:</strong> <span id="modalPatientAddress"></span></p>
+                <hr>
+                <p><strong>Horário:</strong> <span id="modalHour"></span></p>
+                <p><strong>Data:</strong> <span id="modalDate"></span></p>
+                <p><strong>Profissional:</strong> <span id="modalProfessional"></span></p>
+                <p><strong>Especialidade:</strong> <span id="modalSpecialty"></span></p>
+                <p><strong>Status Agendamento:</strong> <span id="modalStatus"></span></p>
+                <p><strong>Parceria:</strong> <span id="modalParceria"></span></p>
+                <p><strong>Tipo de Atendimento:</strong> <span id="modalTipoAtendimento"></span></p> {# NOVO CAMPO: Tipo de Atendimento #}
+                <p><strong>Valor:</strong> <span id="modalValorTotal"></span></p> {# NOVO CAMPO: Valor Total #}
+                <p><strong>Quem Agendou:</strong> <span id="modalQuemAgendou"></span></p> {# NOVO CAMPO: Quem Agendou #}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Script principal que lida com o carregamento da página e interação com modais/formulários.
+        document.addEventListener('DOMContentLoaded', function() {
+            // Referências aos elementos
+            var loadingOverlay = document.getElementById('loading-overlay');
+            var searchButton = document.getElementById('search-button');
+            var agendaForm = document.getElementById('agenda-form');
+
+            var customModalOverlay = document.getElementById('custom-modal-overlay');
+            var customModalTitle = document.getElementById('custom-modal-title');
+            var customModalCloseButton = document.getElementById('custom-modal-close-button');
+
+            // --- Lógica para o Overlay de Carregamento na SUBMISSÃO do formulário ---
+            if (agendaForm && searchButton && loadingOverlay) { // Garante que todos os elementos existam
+                agendaForm.addEventListener('submit', function(event) {
+                    loadingOverlay.style.display = 'flex'; // Exibe o overlay
+                    loadingOverlay.style.opacity = '1'; // Garante que esteja opaco
+                    searchButton.disabled = true; // Desabilita o botão
+                    document.getElementById('loading-message').textContent = 'Buscando agendas...';
+                });
+            }
+
+            // --- Lógica para abrir o Modal de Detalhes Personalizado ---
+            document.querySelectorAll('.appointment-slot').forEach(function(card) {
+                card.addEventListener('click', async function() {
+                    try {
+                        var slotDetails = JSON.parse(this.dataset.slotDetails);
+                        console.log('Detalhes do slot para o modal:', slotDetails); // Debug
+
+                        // Resetar/inicializar campos do modal
+                        const fieldsToReset = [
+                            'modalPatient', 'modalPatientCpf', 'modalPatientPhone', 'modalPatientEmail', 'modalPatientAddress',
+                            'modalHour', 'modalDate', 'modalProfessional', 'modalSpecialty', 'modalStatus', 'modalParceria',
+                            'modalTipoAtendimento', 'modalValorTotal', 'modalQuemAgendou'
+                        ];
+                        fieldsToReset.forEach(id => {
+                            const element = document.getElementById(id);
+                            if (element) {
+                                element.textContent = 'Carregando...'; // Ou 'N/A' se preferir não mostrar "Carregando..."
+                            }
+                        });
+                        
+                        customModalTitle.textContent = `Detalhes de ${slotDetails.patient || 'Agendamento'}`;
+                        customModalOverlay.style.display = 'flex'; // Exibe o overlay do modal
+
+                        // Preencher os dados do agendamento que já vêm do slotDetails (para serem rápidos)
+                        document.getElementById('modalPatient').textContent = slotDetails.patient || 'N/A';
+                        document.getElementById('modalHour').textContent = slotDetails.formatedHour || slotDetails.horario || 'N/A';
+                        document.getElementById('modalDate').textContent = slotDetails.date || 'N/A';
+                        document.getElementById('modalProfessional').textContent = slotDetails.professionalName || 'N/A';
+                        document.getElementById('modalSpecialty').textContent = slotDetails.specialtyName || 'N/A';
+                        document.getElementById('modalStatus').textContent = slotDetails.appointmentStatus || slotDetails.status || 'N/A';
+
+                        // Requisições paralelas para detalhes do paciente e do agendamento completo
+                        const patientPromise = slotDetails.patientId ? 
+                            fetch(`/api/patient_details/${slotDetails.patientId}`).then(res => res.ok ? res.json() : Promise.reject('Patient API Error')) : 
+                            Promise.resolve(null);
+
+                        const appointmentPromise = slotDetails.appointmentId ? 
+                            fetch(`/api/appointment_details/${slotDetails.appointmentId}`).then(res => res.ok ? res.json() : Promise.reject('Appointment API Error')) : 
+                            Promise.resolve(null);
+
+                        const [patientData, appointmentData] = await Promise.allSettled([patientPromise, appointmentPromise]);
+
+                        // --- Preencher dados do Paciente ---
+                        if (patientData.status === 'fulfilled' && patientData.value) {
+                            const pData = patientData.value;
+                            document.getElementById('modalPatientCpf').textContent = pData.cpf || 'N/A';
+                            document.getElementById('modalPatientPhone').textContent = pData.celular || pData.telefone || 'N/A';
+                            document.getElementById('modalPatientEmail').textContent = pData.email || 'N/A';
+                            document.getElementById('modalPatientAddress').textContent = 
+                                `${pData.endereco || ''}, ${pData.numero || ''} - ${pData.bairro || ''}, ${pData.cidade || ''}/${pData.estado || ''} - ${pData.cep || ''}`.trim().replace(/,(\s*,){1,}/g, ',').replace(/^,\s*|,\s*$/g, '') || 'N/A';
+                            document.getElementById('modalParceria').textContent = pData.parceria || 'Particular';
+                        } else {
+                            console.error('Falha ao carregar dados do paciente:', patientData.reason || 'ID não disponível');
+                            document.getElementById('modalPatientCpf').textContent = 'Não disponível';
+                            document.getElementById('modalPatientPhone').textContent = 'Não disponível';
+                            document.getElementById('modalPatientEmail').textContent = 'Não disponível';
+                            document.getElementById('modalPatientAddress').textContent = 'Não disponível';
+                            document.getElementById('modalParceria').textContent = 'Não disponível';
+                        }
+
+                        // --- Preencher dados do Agendamento Completo ---
+                        if (appointmentData.status === 'fulfilled' && appointmentData.value) {
+                            const apptData = appointmentData.value;
+                            console.log('Dados completos do agendamento:', apptData); // Debug
+                            document.getElementById('modalTipoAtendimento').textContent = apptData.agendamentosProcedimentos && apptData.agendamentosProcedimentos[0] && apptData.agendamentosProcedimentos[0].procedimentoId && apptData.agendamentosProcedimentos[0].procedimentoId.tipo ? apptData.agendamentosProcedimentos[0].procedimentoId.tipo.descricao : 'N/A';
+                            document.getElementById('modalValorTotal').textContent = apptData.valorTotal ? `R$ ${apptData.valorTotal.toFixed(2).replace('.', ',')}` : 'N/A';
+                            
+                            // Lógica para "Quem Agendou"
+                            let quemAgendou = 'App Cartão de TODOS';
+                            if (apptData.historicos && apptData.historicos.length > 0 && apptData.historicos[0].atualizadoPor) {
+                                quemAgendou = apptData.historicos[0].atualizadoPor;
+                            } else if (apptData.canalId && apptData.canalId.id === 3) { // Exemplo: Se o canal for 3 (App Cartão de TODOS)
+                                quemAgendou = 'App Cartão de TODOS';
+                            }
+                            document.getElementById('modalQuemAgendou').textContent = quemAgendou;
+
+                        } else {
+                            console.error('Falha ao carregar dados do agendamento completo:', appointmentData.reason || 'ID não disponível');
+                            document.getElementById('modalTipoAtendimento').textContent = 'Não disponível';
+                            document.getElementById('modalValorTotal').textContent = 'Não disponível';
+                            document.getElementById('modalQuemAgendou').textContent = 'Não disponível';
+                        }
+
+                    } catch (e) {
+                        console.error('Erro geral no clique do slot:', e);
+                    }
+                });
+            });
+
+            // --- Lógica para Fechar o Modal de Detalhes Personalizado ---
+            customModalCloseButton.addEventListener('click', function() {
+                customModalOverlay.style.display = 'none';
+            });
+
+            // Fechar ao clicar fora da caixa do modal, mas dentro do overlay
+            customModalOverlay.addEventListener('click', function(event) {
+                if (event.target === customModalOverlay) {
+                    customModalOverlay.style.display = 'none';
+                }
+            });
+
+            // Evitar que cliques dentro da caixa do modal fechem ele
+            document.getElementById('custom-modal-box').addEventListener('click', function(event) {
+                event.stopPropagation();
+            });
+        });
+    </script>
+</body>
+</html>
