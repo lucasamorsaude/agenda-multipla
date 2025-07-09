@@ -222,11 +222,6 @@ h3 a:hover {
 }
 
 
-.table-responsive table tbody tr:last-child {
-    background-color: var(--accent-color) !important; /* Total Agendado com cor de destaque */
-    color: white;
-    font-weight: bold;
-}
 
 /* Abas */
 .nav-tabs .nav-link {

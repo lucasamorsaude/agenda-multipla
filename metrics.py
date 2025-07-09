@@ -150,7 +150,7 @@ def calculate_conversion_rate_for_date(target_date, get_all_professionals_func, 
             # O campo 'encaixe' no slot da API é um booleano (true/false)
             is_encaixe = slot.get('encaixe', False) # Pega o flag 'encaixe' do slot
             
-            if final_status not in ["Livre", "Bloqueado"] and not is_encaixe: # <--- MUDANÇA PRINCIPAL AQUI
+            if final_status not in ["Vago"] and not is_encaixe: # <--- MUDANÇA PRINCIPAL AQUI
                 prof_agendamentos_validos += 1
         
         if prof_agendamentos_validos > 0: # Só adiciona o profissional se houver agendamentos válidos para a conversão
