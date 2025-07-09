@@ -1,48 +1,53 @@
 from flask import Flask, render_template, request, jsonify
-import requests
-from datetime import date
+from datetime import date, timedelta
 import pandas as pd
-from login_auth import get_auth_new
+import requests # Manter requests aqui para as funções que fazem chamadas diretas
 import json
 import os
+
+# Importar as novas funções de cálculo
+from metrics import calculate_summary_metrics, calculate_professional_metrics, calculate_conversion_rate_for_date
+
+# Importar get_auth_new do login_auth
+from login_auth import get_auth_new
 
 app = Flask(__name__)
 
 auth = get_auth_new()
 
-CREDENTIALS_FILE = 'credentials.json'
+# BUG FIX: Certifique-se que o cookie_value é obtido de forma robusta
+# Adicionei a verificação aqui para garantir que cookie_value sempre tenha um valor,
+# seja de local_credentials, ENV, ou vazio.
+local_credentials = None
+CREDENTIALS_FILE = 'credentials.json' # Define o nome do arquivo aqui, antes de load_credentials
 
-def load_credentials():
-    """Carrega as credenciais do arquivo JSON."""
-    if not os.path.exists(CREDENTIALS_FILE):
-        print(f"Erro: Arquivo de credenciais '{CREDENTIALS_FILE}' não encontrado.")
-        # Em um ambiente de produção, você pode levantar um erro ou ter uma estratégia de fallback.
-        return None
-    try:
+# Tenta carregar credenciais locais. No Render, isso será ignorado.
+try:
+    if os.path.exists(CREDENTIALS_FILE):
         with open(CREDENTIALS_FILE, 'r') as f:
-            credentials = json.load(f)
-        return credentials
-    except json.JSONDecodeError as e:
-        print(f"Erro ao decodificar JSON em '{CREDENTIALS_FILE}': {e}")
-        return None
-    except Exception as e:
-        print(f"Erro ao ler arquivo de credenciais: {e}")
-        return None
+            local_credentials = json.load(f)
+except Exception as e:
+    print(f"Aviso: Não foi possível carregar '{CREDENTIALS_FILE}' localmente: {e}")
+    local_credentials = None # Garante que local_credentials seja None em caso de erro
 
-
-credentials = load_credentials()
-
-cookie = credentials.get("cookie")
+cookie_value = ""
+if local_credentials and local_credentials.get("cookie"):
+    cookie_value = local_credentials.get("cookie")
+else:
+    # Fallback para variável de ambiente se o arquivo local não existir ou não tiver 'cookie'
+    cookie_value = os.environ.get("COOKIE_VALUE", "")
 
 HEADERS = {
     'Authorization': f"Bearer {auth}",
-    'Cookie': cookie
+    'Cookie': cookie_value
 }
+# Certifique-se de que a variável de ambiente 'COOKIE_VALUE' esteja definida no Render.
+
 
 PROFISSIONAIS_URL = 'https://amei.amorsaude.com.br/api/v1/profissionais/by-unidade'
 SLOTS_URL = 'https://amei.amorsaude.com.br/api/v1/slots/list-slots-by-professional'
-PACIENTE_URL_TEMPLATE = 'https://amei.amorsaude.com.br/api/v1/pacientes/{}' # NOVA URL
-APPOINTMENT_URL_TEMPLATE = 'https://amei.amorsaude.com.br/api/v1/appointments/{}' # NOVA URL
+PACIENTE_URL_TEMPLATE = 'https://amei.amorsaude.com.br/api/v1/pacientes/{}'
+APPOINTMENT_URL_TEMPLATE = 'https://amei.amorsaude.com.br/api/v1/appointments/{}'
 AGENDA_URL_TEMPLATE = "https://amei.amorsaude.com.br/schedule/schedule-appointment?profissionalId={}&date={}"
 
 STATUS_STYLES = {
@@ -61,7 +66,8 @@ STATUS_STYLES = {
     "default": "background-color: #FAFAFA; border: 1px solid #E0E0E0; color: #757575;"
 }
 
-def get_all_professionals():
+def get_all_professionals(): # Esta função não usa HEADERS diretamente, mas sim a global.
+                            # Para modularidade, talvez passasse HEADERS como argumento no futuro.
     try:
         response = requests.get(PROFISSIONAIS_URL, headers=HEADERS)
         response.raise_for_status()
@@ -103,7 +109,6 @@ def get_patient_details(patient_id):
         print(f"Erro ao buscar detalhes do paciente {patient_id}: {e}")
         return None
 
-# NOVO: Função para buscar detalhes do agendamento
 def get_appointment_details(appointment_id):
     if not appointment_id:
         return None
@@ -116,41 +121,52 @@ def get_appointment_details(appointment_id):
         print(f"Erro ao buscar detalhes do agendamento {appointment_id}: {e}")
         return None
 
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     agendas_por_profissional = {}
     resumo_geral = {}
-    selected_date_str = date.today().strftime('%Y-%m-%d')
     
-    df_resumo = pd.DataFrame()
-    total_agendado_geral = 0
-    total_confirmado_geral = 0
-    percentual_confirmacao = 0.0
-    total_ocupados = 0
-    total_slots_disponiveis = 0
-    percentual_ocupacao = 0.0
+    selected_date = date.today()
+    selected_date_str = selected_date.strftime('%Y-%m-%d')
 
-    profissionais_stats_confirmacao = []
+    df_resumo_html = "" # Inicializa como string vazia
+    summary_metrics = {} # Dicionário para as métricas gerais
+    profissionais_stats_confirmacao = [] # Listas vazias
     profissionais_stats_ocupacao = []
+
+    conversion_data_for_selected_day = { # Inicializa vazio para GET
+        "date": selected_date.strftime('%d/%m/%Y'),
+        "total_atendidos": 0,
+        "total_agendamentos_validos": 0,
+        "conversion_rate": "0.00%",
+        "details_by_professional": []
+    }
 
     if request.method == 'POST':
         selected_date_str = request.form['selected_date']
         selected_date = date.fromisoformat(selected_date_str)
 
-        profissionais = get_all_professionals()
+        all_profissionais = get_all_professionals()
         
-        if profissionais:
-            for prof in profissionais:
+        if all_profissionais:
+            for prof in all_profissionais:
                 prof_id = prof.get('id')
                 prof_nome = prof.get('nome', f'Profissional ID {prof_id}')
                 
                 slots = get_slots_for_professional(prof_id, selected_date)
                 
+                # Flag para verificar se o profissional tem algum agendamento "ativo" (não Livre/Bloqueado)
+                has_active_appointments = False 
                 horarios_processados = []
                 contagem_status = {}
 
                 for slot in slots:
                     status_atual = slot.get('status', 'Indefinido')
+                    
+                    if status_atual not in ["Livre", "Bloqueado"]:
+                        has_active_appointments = True 
+
                     processed_slot = slot.copy() 
                     processed_slot['horario'] = slot.get('formatedHour', 'N/A')
                     processed_slot['paciente'] = slot.get('patient')
@@ -159,7 +175,9 @@ def index():
                     horarios_processados.append(processed_slot)
                     contagem_status[status_atual] = contagem_status.get(status_atual, 0) + 1
             
-                if horarios_processados:
+                # Adiciona o profissional apenas se tiver agendamentos ativos ou se tiver slots vazios mas queremos que apareça a coluna
+                # Se a intenção é "exibir só quem tem agendamentos" (reais), então: if has_active_appointments:
+                if has_active_appointments:
                     agendas_por_profissional[prof_nome] = {
                         "id": prof_id,
                         "horarios": sorted(horarios_processados, key=lambda x: x['numeric_hour'] if 'numeric_hour' in x else 0.0)
@@ -167,85 +185,35 @@ def index():
                     resumo_geral[prof_nome] = contagem_status
 
             if resumo_geral:
-                dados_resumo = []
+                # Criar DataFrame completo para passar para as funções de métricas
+                dados_resumo_para_df = []
                 for profissional, status_dict in resumo_geral.items():
                     linha = {"Profissional": profissional}
                     for status, valor in status_dict.items():
                         linha[status] = int(valor) if isinstance(valor, (int, float)) else 0
-                    dados_resumo.append(linha)
+                    dados_resumo_para_df.append(linha)
 
-                df_resumo = pd.DataFrame(dados_resumo).fillna(0)
-                for col in df_resumo.columns:
+                df_resumo_full = pd.DataFrame(dados_resumo_para_df).fillna(0)
+                for col in df_resumo_full.columns:
                     if col != "Profissional":
-                        df_resumo[col] = df_resumo[col].astype(int)
-
-                df_resumo = df_resumo.set_index("Profissional")
+                        df_resumo_full[col] = df_resumo_full[col].astype(int)
+                df_resumo_full = df_resumo_full.set_index("Profissional")
                 
-                status_excluir = ["Bloqueado", "Livre"]
-                colunas_para_somar = [col for col in df_resumo.columns if col not in status_excluir]
-                
-                # Garante que 'Total Agendado' seja 0 se não houver colunas para somar
-                if colunas_para_somar:
-                    df_resumo["Total Agendado"] = df_resumo[colunas_para_somar].sum(axis=1)
-                else:
-                    df_resumo["Total Agendado"] = 0 # Inicializa como 0 se não houver colunas relevantes
+                # Gerar HTML da tabela de resumo geral ANTES de passar para as métricas,
+                # pois calculate_summary_metrics vai adicionar a coluna "Total Agendado"
+                # que não queremos transposta na tabela original.
+                # A df_resumo_full que será passada para as métricas será a modificada.
+                # Se você quer a tabela de resumo transposta, ela deve ser criada antes do calculo do "Total Agendado"
+                # na calculate_summary_metrics
+                df_resumo_html = df_resumo_full.T.to_html(classes='table table-striped')
 
-                # MODIFICAÇÃO AQUI: Use .get() para acessar as colunas, retornando 0 se não existirem
-                total_agendado_geral = df_resumo["Total Agendado"].sum() if "Total Agendado" in df_resumo.columns else 0
-                total_confirmado_geral = df_resumo.get("Marcado - confirmado", pd.Series([0])).sum() # Usar .get() com pd.Series([0])
-                
-                if total_agendado_geral > 0:
-                    percentual_confirmacao = (total_confirmado_geral / total_agendado_geral) * 100
-                else:
-                    percentual_confirmacao = 0.0 # Garante que seja 0.0 se não há agendados
-
-                all_status_cols = [col for col in df_resumo.columns if col not in ["Profissional", "Total Agendado"]]
-                # Garante que total_ocupados e total_slots_disponiveis sejam 0 se não houver colunas relevantes
-                total_ocupados = df_resumo["Total Agendado"].sum() if "Total Agendado" in df_resumo.columns else 0
-                total_slots_disponiveis = df_resumo[all_status_cols].sum().sum() if all_status_cols else 0
-                
-                if total_slots_disponiveis > 0:
-                    percentual_ocupacao = (total_ocupados / total_slots_disponiveis) * 100
-                else:
-                    percentual_ocupacao = 0.0 # Garante que seja 0.0 se não há slots
-
-                # --- LÓGICA PARA CONFIRMAÇÃO E OCUPAÇÃO POR PROFISSIONAL ---
-                profissionais_stats_confirmacao = [] # Reinicializa para garantir que sempre seja uma lista
-                profissionais_stats_ocupacao = [] # Reinicializa para garantir que sempre seja uma lista
-
-                for profissional, row in df_resumo.iterrows():
-                    # Confirmação por profissional
-                    agendados_prof = row.get("Total Agendado", 0) # Já usa .get()
-                    confirmados_prof = row.get("Marcado - confirmado", 0) # <--- ESSA LINHA PRECISA USAR .get(..., 0)
-                    percentual_prof_confirmacao = (confirmados_prof / agendados_prof * 100) if agendados_prof > 0 else 0.0
-                    profissionais_stats_confirmacao.append({
-                        "nome": profissional,
-                        "agendados": agendados_prof,
-                        "confirmados": confirmados_prof,
-                        "percentual": f"{percentual_prof_confirmacao:.2f}"
-                    })
-
-                    # Ocupação por profissional
-                    ocupados_prof = row.get("Total Agendado", 0) # Já usa .get()
-                    # total_slots_prof deve somar todas as colunas de status exceto "Profissional" e "Total Agendado"
-                    # Se 'all_status_cols' está vazio, a soma deve ser 0 para evitar erro.
-                    # Aqui é um pouco mais complexo, pois row[all_status_cols].sum() pode dar erro se all_status_cols
-                    # contiver uma coluna que não está no row. A melhor forma é garantir que all_status_cols
-                    # contenha apenas colunas que realmente estão no df_resumo para aquele dia.
-                    # Ou iterar sobre os status que realmente existem em 'row'.
-                    
-                    # Vamos manter a versão mais robusta:
-                    total_slots_prof = 0
-                    for status_col in all_status_cols:
-                        total_slots_prof += row.get(status_col, 0) # Soma apenas as colunas que existem
-
-                    percentual_prof_ocupacao = (ocupados_prof / total_slots_prof * 100) if total_slots_prof > 0 else 0.0
-                    profissionais_stats_ocupacao.append({
-                        "nome": profissional,
-                        "ocupados": ocupados_prof,
-                        "total_slots": total_slots_prof,
-                        "percentual": f"{percentual_prof_ocupacao:.2f}"
-                    })
+                # Chamar as funções do metrics.py
+                summary_metrics = calculate_summary_metrics(resumo_geral, df_resumo_full.copy()) # Passa uma cópia
+                profissionais_stats_confirmacao, profissionais_stats_ocupacao = calculate_professional_metrics(df_resumo_full)
+        
+        conversion_data_for_selected_day = calculate_conversion_rate_for_date(
+            selected_date, get_all_professionals, get_slots_for_professional # Passa as funções como argumento
+        )
 
     return render_template(
         'index.html',
@@ -254,18 +222,18 @@ def index():
         status_styles=STATUS_STYLES,
         agenda_url_template=AGENDA_URL_TEMPLATE,
         resumo_geral=resumo_geral,
-        df_resumo_html=df_resumo.T.to_html(classes='table table-striped') if not df_resumo.empty else "",
-        total_agendado_geral=total_agendado_geral,
-        total_confirmado_geral=total_confirmado_geral,
-        percentual_confirmacao=f"{percentual_confirmacao:.2f}",
-        total_ocupados=total_ocupados,
-        total_slots_disponiveis=total_slots_disponiveis,
-        percentual_ocupacao=f"{percentual_ocupacao:.2f}",
+        df_resumo_html=df_resumo_html, # Usar o HTML gerado diretamente
+        total_agendado_geral=summary_metrics.get("total_agendado_geral", 0),
+        total_confirmado_geral=summary_metrics.get("total_confirmado_geral", 0),
+        percentual_confirmacao=summary_metrics.get("percentual_confirmacao", "0.00%"),
+        total_ocupados=summary_metrics.get("total_ocupados", 0),
+        total_slots_disponiveis=summary_metrics.get("total_slots_disponiveis", 0),
+        percentual_ocupacao=summary_metrics.get("percentual_ocupacao", "0.00%"),
         profissionais_stats_confirmacao=profissionais_stats_confirmacao,
-        profissionais_stats_ocupacao=profissionais_stats_ocupacao
+        profissionais_stats_ocupacao=profissionais_stats_ocupacao,
+        conversion_data_for_selected_day=conversion_data_for_selected_day
     )
 
-# NOVO ENDPOINT para buscar detalhes do paciente
 @app.route('/api/patient_details/<int:patient_id>', methods=['GET'])
 def patient_details_api(patient_id):
     details = get_patient_details(patient_id)
@@ -274,7 +242,6 @@ def patient_details_api(patient_id):
     else:
         return jsonify({"error": "Paciente não encontrado ou erro na API"}), 404
 
-# NOVO ENDPOINT para buscar detalhes do agendamento (completo)
 @app.route('/api/appointment_details/<int:appointment_id>', methods=['GET'])
 def appointment_details_api(appointment_id):
     details = get_appointment_details(appointment_id)

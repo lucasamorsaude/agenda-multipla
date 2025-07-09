@@ -6,11 +6,8 @@
     <title>Agenda Múltipla</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    {# Removido o bloco <style> inline para o loading-overlay daqui #}
 </head>
 <body>
-    {# Removido o script inline do topo do body #}
-
     <header>
         <h1 class="my-0">📅 Agenda Múltipla</h1>
         <p class="mb-0">Visualize todos os horários (livres, agendados, etc.) lado a lado. <strong>Clique no nome do profissional para abrir no sistema Amei.</strong></p>
@@ -23,7 +20,6 @@
             <button type="submit" class="btn btn-primary" id="search-button">Buscar Agendas</button>
         </form>
 
-        {# Overlay de Carregamento para a busca (Este deve estar com display:none no CSS por padrão) #}
         <div id="loading-overlay">
             <div class="spinner-border" role="status">
                 <span class="sr-only">Carregando...</span>
@@ -61,6 +57,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" id="prof-occupancy-tab" data-toggle="tab" href="#prof-occupancy" role="tab" aria-controls="prof-occupancy" aria-selected="false">Taxa de Ocupação por Profissional</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="conversion-tab" data-toggle="tab" href="#conversion" role="tab" aria-controls="conversion" aria-selected="false">Conversão de Atendimentos</a>
                         </li>
                     </ul>
                     <div class="tab-content" id="myTabContent">
@@ -128,6 +127,35 @@
                                 <p class="text-info">Nenhum dado de ocupação por profissional disponível.</p>
                             {% endif %}
                         </div>
+                        {# NOVA ABA DE CONVERSÃO AQUI #}
+                        <div class="tab-pane fade" id="conversion" role="tabpanel" aria-labelledby="conversion-tab">
+                            <h5 class="mt-3">Conversão de Atendimentos para o Dia: {{ conversion_data_for_selected_day.date }}</h5> {# Título ajustado #}
+                            {% if conversion_data_for_selected_day.total_agendamentos_validos > 0 %}
+                                <p><strong>Total Atendidos:</strong> {{ conversion_data_for_selected_day.total_atendidos }}</p>
+                                <p><strong>Total Agendamentos Válidos:</strong> {{ conversion_data_for_selected_day.total_agendamentos_validos }}</p>
+                                <p><strong>Taxa de Conversão Geral:</strong> {{ conversion_data_for_selected_day.conversion_rate }}</p>
+                                <div class="progress-bar-container">
+                                    {% set conv_rate = conversion_data_for_selected_day.conversion_rate | replace('%', '') | float %}
+                                    {% set conv_color = '#FF4B4B' if conv_rate < 60 else ('#FFA500' if conv_rate < 80 else '#4CAF50') %}
+                                    <div class="progress-bar-fill" style="width: {{ conv_rate }}%; background-color: {{ conv_color }};"></div>
+                                </div>
+                                <hr>
+                                <h6>Conversão por Profissional:</h6>
+                                {% for prof_conv_stats in conversion_data_for_selected_day.details_by_professional %}
+                                    <p class="mt-3"><strong>{{ prof_conv_stats.nome }}</strong></p>
+                                    <p>Atendidos: {{ prof_conv_stats.atendidos }}, Agendamentos Válidos: {{ prof_conv_stats.agendamentos_validos }}</p>
+                                    <p>Taxa de Conversão: {{ prof_conv_stats.conversion_rate }}</p>
+                                    <div class="progress-bar-container">
+                                        {% set prof_conv_rate = prof_conv_stats.conversion_rate | replace('%', '') | float %}
+                                        {% set prof_conv_color = '#FF4B4B' if prof_conv_rate < 60 else ('#FFA500' if prof_conv_rate < 80 else '#4CAF50') %}
+                                        <div class="progress-bar-fill" style="width: {{ prof_conv_rate }}%; background-color: {{ prof_conv_color }};"></div>
+                                    </div>
+                                    <hr>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-info">Não há agendamentos válidos para calcular a conversão para o dia ({{ conversion_data_for_selected_day.date }}).</p>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -142,7 +170,7 @@
                         </h3>
                         <div class="slot-content-wrapper">
                             {% for slot in agenda_data['horarios'] %}
-                                {% set estilo_div = status_styles.get(slot['status'], slot.get('appointmentStatus', 'default')) %} {# Usando appointmentStatus se status for indefinido #}
+                                {% set estilo_div = status_styles.get(slot['status'], slot.get('appointmentStatus', 'default')) %}
                                 {% if slot['paciente'] %}
                                     <div class="slot-card appointment-slot" style="{{ estilo_div }}"
                                          data-slot-details="{{ slot | tojson | forceescape }}">
@@ -187,9 +215,9 @@
                 <p><strong>Especialidade:</strong> <span id="modalSpecialty"></span></p>
                 <p><strong>Status Agendamento:</strong> <span id="modalStatus"></span></p>
                 <p><strong>Parceria:</strong> <span id="modalParceria"></span></p>
-                <p><strong>Tipo de Atendimento:</strong> <span id="modalTipoAtendimento"></span></p> {# NOVO CAMPO: Tipo de Atendimento #}
-                <p><strong>Valor:</strong> <span id="modalValorTotal"></span></p> {# NOVO CAMPO: Valor Total #}
-                <p><strong>Quem Agendou:</strong> <span id="modalQuemAgendou"></span></p> {# NOVO CAMPO: Quem Agendou #}
+                <p><strong>Tipo de Atendimento:</strong> <span id="modalTipoAtendimento"></span></p>
+                <p><strong>Valor:</strong> <span id="modalValorTotal"></span></p>
+                <p><strong>Quem Agendou:</strong> <span id="modalQuemAgendou"></span></p>
             </div>
         </div>
     </div>
@@ -198,9 +226,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        // Script principal que lida com o carregamento da página e interação com modais/formulários.
         document.addEventListener('DOMContentLoaded', function() {
-            // Referências aos elementos
             var loadingOverlay = document.getElementById('loading-overlay');
             var searchButton = document.getElementById('search-button');
             var agendaForm = document.getElementById('agenda-form');
@@ -210,11 +236,11 @@
             var customModalCloseButton = document.getElementById('custom-modal-close-button');
 
             // --- Lógica para o Overlay de Carregamento na SUBMISSÃO do formulário ---
-            if (agendaForm && searchButton && loadingOverlay) { // Garante que todos os elementos existam
+            if (agendaForm && searchButton && loadingOverlay) {
                 agendaForm.addEventListener('submit', function(event) {
-                    loadingOverlay.style.display = 'flex'; // Exibe o overlay
-                    loadingOverlay.style.opacity = '1'; // Garante que esteja opaco
-                    searchButton.disabled = true; // Desabilita o botão
+                    loadingOverlay.style.display = 'flex';
+                    loadingOverlay.style.opacity = '1';
+                    searchButton.disabled = true;
                     document.getElementById('loading-message').textContent = 'Buscando agendas...';
                 });
             }
@@ -224,7 +250,7 @@
                 card.addEventListener('click', async function() {
                     try {
                         var slotDetails = JSON.parse(this.dataset.slotDetails);
-                        console.log('Detalhes do slot para o modal:', slotDetails); // Debug
+                        console.log('Detalhes do slot para o modal:', slotDetails);
 
                         // Resetar/inicializar campos do modal
                         const fieldsToReset = [
@@ -235,12 +261,12 @@
                         fieldsToReset.forEach(id => {
                             const element = document.getElementById(id);
                             if (element) {
-                                element.textContent = 'Carregando...'; // Ou 'N/A' se preferir não mostrar "Carregando..."
+                                element.textContent = 'Carregando...';
                             }
                         });
                         
                         customModalTitle.textContent = `Detalhes de ${slotDetails.patient || 'Agendamento'}`;
-                        customModalOverlay.style.display = 'flex'; // Exibe o overlay do modal
+                        customModalOverlay.style.display = 'flex';
 
                         // Preencher os dados do agendamento que já vêm do slotDetails (para serem rápidos)
                         document.getElementById('modalPatient').textContent = slotDetails.patient || 'N/A';
@@ -249,6 +275,8 @@
                         document.getElementById('modalProfessional').textContent = slotDetails.professionalName || 'N/A';
                         document.getElementById('modalSpecialty').textContent = slotDetails.specialtyName || 'N/A';
                         document.getElementById('modalStatus').textContent = slotDetails.appointmentStatus || slotDetails.status || 'N/A';
+                        document.getElementById('modalParceria').textContent = 'Carregando...';
+
 
                         // Requisições paralelas para detalhes do paciente e do agendamento completo
                         const patientPromise = slotDetails.patientId ? 
@@ -282,15 +310,14 @@
                         // --- Preencher dados do Agendamento Completo ---
                         if (appointmentData.status === 'fulfilled' && appointmentData.value) {
                             const apptData = appointmentData.value;
-                            console.log('Dados completos do agendamento:', apptData); // Debug
+                            console.log('Dados completos do agendamento:', apptData);
                             document.getElementById('modalTipoAtendimento').textContent = apptData.agendamentosProcedimentos && apptData.agendamentosProcedimentos[0] && apptData.agendamentosProcedimentos[0].procedimentoId && apptData.agendamentosProcedimentos[0].procedimentoId.tipo ? apptData.agendamentosProcedimentos[0].procedimentoId.tipo.descricao : 'N/A';
                             document.getElementById('modalValorTotal').textContent = apptData.valorTotal ? `R$ ${apptData.valorTotal.toFixed(2).replace('.', ',')}` : 'N/A';
                             
-                            // Lógica para "Quem Agendou"
-                            let quemAgendou = 'App Cartão de TODOS';
+                            let quemAgendou = 'N/A'; // Default para N/A
                             if (apptData.historicos && apptData.historicos.length > 0 && apptData.historicos[0].atualizadoPor) {
                                 quemAgendou = apptData.historicos[0].atualizadoPor;
-                            } else if (apptData.canalId && apptData.canalId.id === 3) { // Exemplo: Se o canal for 3 (App Cartão de TODOS)
+                            } else if (apptData.canalId && apptData.canalId.id === 3) { // Se o canal for 3 (App Cartão de TODOS)
                                 quemAgendou = 'App Cartão de TODOS';
                             }
                             document.getElementById('modalQuemAgendou').textContent = quemAgendou;
