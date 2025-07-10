@@ -18,6 +18,9 @@
             <label for="selected_date" class="mr-2">Selecione a data:</label>
             <input type="date" id="selected_date" name="selected_date" class="form-control mr-2" value="{{ selected_date }}">
             <button type="submit" class="btn btn-primary" id="search-button">Buscar Agendas</button>
+            <button type="button" class="btn btn-warning ml-2" id="refresh-cache-button">
+                🔄 Atualizar Agora
+            </button>
         </form>
 
         <div id="loading-overlay">
@@ -230,10 +233,49 @@
             var loadingOverlay = document.getElementById('loading-overlay');
             var searchButton = document.getElementById('search-button');
             var agendaForm = document.getElementById('agenda-form');
+            var refreshCacheButton = document.getElementById('refresh-cache-button');
 
             var customModalOverlay = document.getElementById('custom-modal-overlay');
             var customModalTitle = document.getElementById('custom-modal-title');
             var customModalCloseButton = document.getElementById('custom-modal-close-button');
+
+
+            if (refreshCacheButton) {
+                refreshCacheButton.addEventListener('click', function() {
+                    if (confirm('Tem certeza que deseja atualizar os dados agora? Isso pode levar alguns segundos.')) {
+                        loadingOverlay.style.display = 'flex';
+                        loadingOverlay.style.opacity = '1';
+                        document.getElementById('loading-message').textContent = 'Atualizando dados...'; // Mensagem mais específica
+
+                        // Pega a data atual do input para enviar ao backend
+                        var currentDate = document.getElementById('selected_date').value;
+
+                        fetch('/force_update_cache', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'selected_date_force_update=' + currentDate // Envia a data selecionada para o backend
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                alert(data.message);
+                                // Recarrega a página para exibir os dados atualizados
+                                window.location.reload(); 
+                            } else {
+                                alert('Erro ao atualizar cache: ' + (data.message || 'Desconhecido'));
+                                loadingOverlay.style.display = 'none'; // Esconde o overlay em caso de erro
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erro na requisição de atualização:', error);
+                            alert('Erro de rede ou servidor ao tentar atualizar. Verifique o console.');
+                            loadingOverlay.style.display = 'none'; // Esconde o overlay em caso de erro
+                        });
+                    }
+                });
+            }
 
             // --- Lógica para o Overlay de Carregamento na SUBMISSÃO do formulário ---
             if (agendaForm && searchButton && loadingOverlay) {

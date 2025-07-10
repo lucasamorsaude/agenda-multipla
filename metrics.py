@@ -31,16 +31,18 @@ def calculate_summary_metrics(resumo_geral, df_resumo_full):
         else:
             df_resumo_full["Total Agendado"] = 0
 
-        total_agendado_geral = df_resumo_full["Total Agendado"].sum() if "Total Agendado" in df_resumo_full.columns else 0
-        total_confirmado_geral = df_resumo_full.get("Marcado - confirmado", pd.Series([0])).sum()
+        # Converte para int() para garantir compatibilidade com JSON
+        total_agendado_geral = int(df_resumo_full["Total Agendado"].sum()) if "Total Agendado" in df_resumo_full.columns else 0
+        total_confirmado_geral = int(df_resumo_full.get("Marcado - confirmado", pd.Series([0])).sum())
 
         if total_agendado_geral > 0:
             percentual_confirmacao = (total_confirmado_geral / total_agendado_geral) * 100
 
         # Para ocupação, consideramos todos os slots (Livre, Bloqueado, etc.)
         all_status_cols_for_occupancy = [col for col in df_resumo_full.columns if col not in ["Profissional", "Total Agendado"]]
-        total_ocupados = df_resumo_full["Total Agendado"].sum() if "Total Agendado" in df_resumo_full.columns else 0
-        total_slots_disponiveis = df_resumo_full[all_status_cols_for_occupancy].sum().sum() if all_status_cols_for_occupancy else 0
+        # Converte para int() para garantir compatibilidade com JSON
+        total_ocupados = int(df_resumo_full["Total Agendado"].sum()) if "Total Agendado" in df_resumo_full.columns else 0
+        total_slots_disponiveis = int(df_resumo_full[all_status_cols_for_occupancy].sum().sum()) if all_status_cols_for_occupancy else 0
         
         if total_slots_disponiveis > 0:
             percentual_ocupacao = (total_ocupados / total_slots_disponiveis) * 100
@@ -73,8 +75,9 @@ def calculate_professional_metrics(df_resumo_full):
         all_status_cols_for_occupancy = [col for col in df_resumo_full.columns if col not in ["Profissional", "Total Agendado"]]
 
         for profissional, row in df_resumo_full.iterrows():
-            agendados_prof = row.get("Total Agendado", 0) 
-            confirmados_prof = row.get("Marcado - confirmado", 0)
+            # Converte para int() para garantir compatibilidade com JSON
+            agendados_prof = int(row.get("Total Agendado", 0)) 
+            confirmados_prof = int(row.get("Marcado - confirmado", 0))
             percentual_prof_confirmacao = (confirmados_prof / agendados_prof * 100) if agendados_prof > 0 else 0.0
             profissionais_stats_confirmacao.append({
                 "nome": profissional,
@@ -84,10 +87,11 @@ def calculate_professional_metrics(df_resumo_full):
             })
 
             # Ocupação por profissional
-            ocupados_prof = row.get("Total Agendado", 0) # Já está sem encaixe
+            # Converte para int() para garantir compatibilidade com JSON
+            ocupados_prof = int(row.get("Total Agendado", 0)) 
             total_slots_prof = 0
             for status_col in all_status_cols_for_occupancy:
-                total_slots_prof += row.get(status_col, 0)
+                total_slots_prof += int(row.get(status_col, 0)) # Converte para int()
             
             percentual_prof_ocupacao = (ocupados_prof / total_slots_prof * 100) if total_slots_prof > 0 else 0.0
             profissionais_stats_ocupacao.append({
@@ -112,7 +116,7 @@ def calculate_conversion_rate_for_date(target_date, get_all_professionals_func, 
         dict: Dados de conversão geral e por profissional.
     """
     total_atendidos = 0
-    total_agendamentos_validos = 0 # Agendamentos que podem ser convertidos (exclui Livre e Bloqueado, MAS AGORA EXCLUI ENCAIXE TAMBÉM)
+    total_agendamentos_validos = 0 
     
     profissionais = get_all_professionals_func()
     
@@ -137,23 +141,21 @@ def calculate_conversion_rate_for_date(target_date, get_all_professionals_func, 
         prof_agendamentos_validos = 0
 
         for slot in slots:
-            # Tenta usar 'appointmentStatus' primeiro, se não existir, usa 'status'
             final_status = slot.get('appointmentStatus', slot.get('status', 'Indefinido')) 
             
-            # Contabiliza "Atendido" e "Atendido pós-consulta" para atendidos
-            # Isso inclui encaixes que foram atendidos
             if final_status in ["Atendido", "Atendido pós-consulta","Não compareceu pós-consulta"]: 
                 prof_atendidos += 1
             
-            # Agendamentos válidos para conversão (DENOMINADOR):
-            # Tudo que não é "Livre" ou "Bloqueado" E NÃO É UM ENCAIXE.
-            # O campo 'encaixe' no slot da API é um booleano (true/false)
-            is_encaixe = slot.get('encaixe', False) # Pega o flag 'encaixe' do slot
+            is_encaixe = slot.get('encaixe', False) 
             
-            if final_status not in ["Vago"] and not is_encaixe: # <--- MUDANÇA PRINCIPAL AQUI
+            if final_status not in ["Vago"] and not is_encaixe: 
                 prof_agendamentos_validos += 1
         
-        if prof_agendamentos_validos > 0: # Só adiciona o profissional se houver agendamentos válidos para a conversão
+        # Converte para int() para garantir compatibilidade com JSON
+        prof_atendidos = int(prof_atendidos)
+        prof_agendamentos_validos = int(prof_agendamentos_validos)
+
+        if prof_agendamentos_validos > 0: 
             total_atendidos += prof_atendidos
             total_agendamentos_validos += prof_agendamentos_validos
 
@@ -164,6 +166,10 @@ def calculate_conversion_rate_for_date(target_date, get_all_professionals_func, 
                 "agendamentos_validos": prof_agendamentos_validos,
                 "conversion_rate": f"{prof_conversion_rate:.2f}%"
             })
+
+    # Converte para int() para garantir compatibilidade com JSON
+    total_atendidos = int(total_atendidos)
+    total_agendamentos_validos = int(total_agendamentos_validos)
 
     overall_conversion_rate = (total_atendidos / total_agendamentos_validos * 100) if total_agendamentos_validos > 0 else 0.0
 

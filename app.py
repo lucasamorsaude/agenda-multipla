@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from cache_manager import save_agendas_to_cache, load_agendas_from_cache, delete_day_from_cache
 from datetime import date, timedelta
 import pandas as pd
 import requests # Manter requests aqui para as funções que fazem chamadas diretas
@@ -130,12 +131,13 @@ def index():
     selected_date = date.today()
     selected_date_str = selected_date.strftime('%Y-%m-%d')
 
-    df_resumo_html = "" # Inicializa como string vazia
-    summary_metrics = {} # Dicionário para as métricas gerais
-    profissionais_stats_confirmacao = [] # Listas vazias
+    df_resumo_html = ""
+    summary_metrics = {}
+    profissionais_stats_confirmacao = []
     profissionais_stats_ocupacao = []
 
-    conversion_data_for_selected_day = { # Inicializa vazio para GET
+    # Garante que conversion_data_for_selected_day tenha uma estrutura completa no início
+    conversion_data_for_selected_day = {
         "date": selected_date.strftime('%d/%m/%Y'),
         "total_atendidos": 0,
         "total_agendamentos_validos": 0,
@@ -147,73 +149,107 @@ def index():
         selected_date_str = request.form['selected_date']
         selected_date = date.fromisoformat(selected_date_str)
 
-        all_profissionais = get_all_professionals()
-        
-        if all_profissionais:
-            for prof in all_profissionais:
-                prof_id = prof.get('id')
-                prof_nome = prof.get('nome', f'Profissional ID {prof_id}')
-                
-                slots = get_slots_for_professional(prof_id, selected_date)
-                
-                # Flag para verificar se o profissional tem algum agendamento "ativo" (não Livre/Bloqueado)
-                has_active_appointments = False 
-                horarios_processados = []
-                contagem_status = {}
+        # Tentar carregar do cache primeiro
+        cached_data = load_agendas_from_cache(selected_date)
 
-                for slot in slots:
-                    status_atual = slot.get('status', 'Indefinido')
-                    
-                    if status_atual not in ["Livre", "Bloqueado"]:
-                        has_active_appointments = True 
-
-                    processed_slot = slot.copy() 
-                    processed_slot['horario'] = slot.get('formatedHour', 'N/A')
-                    processed_slot['paciente'] = slot.get('patient')
-                    processed_slot['status'] = status_atual
-                    
-                    horarios_processados.append(processed_slot)
-                    contagem_status[status_atual] = contagem_status.get(status_atual, 0) + 1
+        if cached_data: # cached_data agora contém os dados apenas para o dia selecionado
+            print(f"Dados carregados do cache para {selected_date_str}")
+            agendas_por_profissional = cached_data.get("agendas_por_profissional", {})
+            resumo_geral = cached_data.get("resumo_geral", {})
             
-                # Adiciona o profissional apenas se tiver agendamentos ativos ou se tiver slots vazios mas queremos que apareça a coluna
-                # Se a intenção é "exibir só quem tem agendamentos" (reais), então: if has_active_appointments:
-                if has_active_appointments:
-                    agendas_por_profissional[prof_nome] = {
-                        "id": prof_id,
-                        "horarios": sorted(horarios_processados, key=lambda x: x['numeric_hour'] if 'numeric_hour' in x else 0.0)
-                    }
-                    resumo_geral[prof_nome] = contagem_status
+            df_resumo_html = cached_data.get("df_resumo_html", "")
+            summary_metrics = cached_data.get("summary_metrics", {})
+            profissionais_stats_confirmacao = cached_data.get("profissionais_stats_confirmacao", [])
+            profissionais_stats_ocupacao = cached_data.get("profissionais_stats_ocupacao", [])
+            
+            cached_conversion = cached_data.get("conversion_data_for_selected_day", {})
+            conversion_data_for_selected_day = {
+                "date": cached_conversion.get("date", selected_date.strftime('%d/%m/%Y')),
+                "total_atendidos": cached_conversion.get("total_atendidos", 0),
+                "total_agendamentos_validos": cached_conversion.get("total_agendamentos_validos", 0),
+                "conversion_rate": cached_conversion.get("conversion_rate", "0.00%"),
+                "details_by_professional": cached_conversion.get("details_by_professional", [])
+            }
 
-            if resumo_geral:
-                # Criar DataFrame completo para passar para as funções de métricas
-                dados_resumo_para_df = []
-                for profissional, status_dict in resumo_geral.items():
-                    linha = {"Profissional": profissional}
-                    for status, valor in status_dict.items():
-                        linha[status] = int(valor) if isinstance(valor, (int, float)) else 0
-                    dados_resumo_para_df.append(linha)
 
-                df_resumo_full = pd.DataFrame(dados_resumo_para_df).fillna(0)
-                for col in df_resumo_full.columns:
-                    if col != "Profissional":
-                        df_resumo_full[col] = df_resumo_full[col].astype(int)
-                df_resumo_full = df_resumo_full.set_index("Profissional")
+        else:
+            print(f"Cache não encontrado ou inválido para {selected_date_str}. Buscando da API...")
+            all_profissionais = get_all_professionals()
+            
+            if all_profissionais:
+                for prof in all_profissionais:
+                    prof_id = prof.get('id')
+                    prof_nome = prof.get('nome', f'Profissional ID {prof_id}')
+                    
+                    slots = get_slots_for_professional(prof_id, selected_date)
+                    
+                    has_active_appointments = False 
+                    horarios_processados = []
+                    contagem_status = {}
+
+                    for slot in slots:
+                        status_atual = slot.get('status', 'Indefinido')
+                        
+                        if status_atual not in ["Livre", "Bloqueado"]:
+                            has_active_appointments = True 
+
+                        processed_slot = slot.copy() 
+                        processed_slot['horario'] = slot.get('formatedHour', 'N/A')
+                        processed_slot['paciente'] = slot.get('patient')
+                        processed_slot['status'] = status_atual
+                        
+                        horarios_processados.append(processed_slot)
+                        contagem_status[status_atual] = contagem_status.get(status_atual, 0) + 1
                 
-                # Gerar HTML da tabela de resumo geral ANTES de passar para as métricas,
-                # pois calculate_summary_metrics vai adicionar a coluna "Total Agendado"
-                # que não queremos transposta na tabela original.
-                # A df_resumo_full que será passada para as métricas será a modificada.
-                # Se você quer a tabela de resumo transposta, ela deve ser criada antes do calculo do "Total Agendado"
-                # na calculate_summary_metrics
-                df_resumo_html = df_resumo_full.T.to_html(classes='table table-striped')
+                    if has_active_appointments:
+                        agendas_por_profissional[prof_nome] = {
+                            "id": prof_id,
+                            "horarios": sorted(horarios_processados, key=lambda x: x['numeric_hour'] if 'numeric_hour' in x else 0.0)
+                        }
+                        resumo_geral[prof_nome] = contagem_status
 
-                # Chamar as funções do metrics.py
-                summary_metrics = calculate_summary_metrics(resumo_geral, df_resumo_full.copy()) # Passa uma cópia
+                if resumo_geral: # Este if é importante para evitar erros se não houver dados de resumo
+                    dados_resumo_para_df = []
+                    for profissional, status_dict in resumo_geral.items():
+                        linha = {"Profissional": profissional}
+                        for status, valor in status_dict.items():
+                            linha[status] = int(valor) if isinstance(valor, (int, float)) else 0
+                        dados_resumo_para_df.append(linha)
+
+                    df_resumo_full = pd.DataFrame(dados_resumo_para_df).fillna(0)
+                    for col in df_resumo_full.columns:
+                        if col != "Profissional":
+                            df_resumo_full[col] = df_resumo_full[col].astype(int)
+                    df_resumo_full = df_resumo_full.set_index("Profissional")
+                    
+                    df_resumo_html = df_resumo_full.T.to_html(classes='table table-striped')
+
+                    summary_metrics = calculate_summary_metrics(resumo_geral, df_resumo_full.copy())
+                    profissionais_stats_confirmacao, profissionais_stats_ocupacao = calculate_professional_metrics(df_resumo_full)
+                
+                conversion_data_for_selected_day = calculate_conversion_rate_for_date(
+                    selected_date, get_all_professionals, get_slots_for_professional
+                )
+
+                # Salvar no cache após buscar da API.
+                # Este 'cache_data_to_save' é o 'day_data' que será inserido no cache mensal.
+                cache_data_to_save = {
+                    "agendas_por_profissional": agendas_por_profissional,
+                    "resumo_geral": resumo_geral,
+                    "df_resumo_html": df_resumo_html,
+                    "summary_metrics": summary_metrics,
+                    "profissionais_stats_confirmacao": profissionais_stats_confirmacao,
+                    "profissionais_stats_ocupacao": profissionais_stats_ocupacao,
+                    "conversion_data_for_selected_day": conversion_data_for_selected_day
+                }
+                save_agendas_to_cache(cache_data_to_save, selected_date)
+
+                summary_metrics = calculate_summary_metrics(resumo_geral, df_resumo_full.copy())
                 profissionais_stats_confirmacao, profissionais_stats_ocupacao = calculate_professional_metrics(df_resumo_full)
-        
-        conversion_data_for_selected_day = calculate_conversion_rate_for_date(
-            selected_date, get_all_professionals, get_slots_for_professional # Passa as funções como argumento
-        )
+            
+            conversion_data_for_selected_day = calculate_conversion_rate_for_date(
+                selected_date, get_all_professionals, get_slots_for_professional
+            )
 
     return render_template(
         'index.html',
@@ -249,6 +285,17 @@ def appointment_details_api(appointment_id):
         return jsonify(details)
     else:
         return jsonify({"error": "Agendamento não encontrado ou erro na API"}), 404
+
+@app.route('/force_update_cache', methods=['POST'])
+def force_update_cache():
+    selected_date_str = request.form.get('selected_date_force_update', date.today().strftime('%Y-%m-%d'))
+    selected_date = date.fromisoformat(selected_date_str)
+    
+    # Limpa o cache para o mês da data selecionada
+    delete_day_from_cache(selected_date)
+    
+    # Redireciona para a página principal para que ela recarregue os dados (agora da API)
+    return jsonify({"status": "success", "message": "Cache limpo e atualização forçada iniciada.", "redirect_date": selected_date_str})
 
 if __name__ == '__main__':
     app.run(debug=True)
