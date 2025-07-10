@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from cache_manager import save_agendas_to_cache, load_agendas_from_cache, delete_day_from_cache
+from update_cache_script import update_period_cache # Importa a nova função
 from datetime import date, timedelta
 import pandas as pd
 import requests # Manter requests aqui para as funções que fazem chamadas diretas
@@ -286,16 +287,37 @@ def appointment_details_api(appointment_id):
     else:
         return jsonify({"error": "Agendamento não encontrado ou erro na API"}), 404
 
-@app.route('/force_update_cache', methods=['POST'])
-def force_update_cache():
+@app.route('/force_update_day_cache', methods=['POST']) # Renomeado para clareza
+def force_update_day_cache():
     selected_date_str = request.form.get('selected_date_force_update', date.today().strftime('%Y-%m-%d'))
     selected_date = date.fromisoformat(selected_date_str)
     
-    # Limpa o cache para o mês da data selecionada
     delete_day_from_cache(selected_date)
     
     # Redireciona para a página principal para que ela recarregue os dados (agora da API)
-    return jsonify({"status": "success", "message": "Cache limpo e atualização forçada iniciada.", "redirect_date": selected_date_str})
+    return jsonify({"status": "success", "message": "Cache do dia limpo e atualização forçada iniciada.", "redirect_date": selected_date_str})
+
+
+@app.route('/force_update_month_cache', methods=['POST'])
+def force_update_month_cache():
+    # Define o período para atualização: do dia atual até o final do mês.
+    today = date.today()
+    last_day_of_month = date(today.year, today.month, 1) + timedelta(days=32) # Próximo mês + 2 dias para garantir
+    last_day_of_month = last_day_of_month.replace(day=1) - timedelta(days=1) # Volta para o último dia do mês atual
+    
+    # Limpa o cache do mês inteiro para forçar uma recarga completa
+    # Nota: delete_day_from_cache opera por dia. Se quiser apagar o arquivo do mês, você precisaria
+    # re-adicionar ou ajustar a clear_cache_for_month original em cache_manager e chamar aqui.
+    # Por enquanto, ele vai re-processar e sobrescrever cada dia.
+    
+    # Chama a função de atualização para o período
+    # Você pode passar 'today' e 'last_day_of_month' como start/end_date
+    # Ou 'today' e 'today + timedelta(days=X)' se preferir X dias a partir de hoje
+    update_period_cache(today, last_day_of_month) 
+    
+    return jsonify({"status": "success", "message": "Atualização do cache do mês iniciada. Isso pode levar alguns minutos."})
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
