@@ -21,9 +21,6 @@
             <button type="button" class="btn btn-warning ml-2" id="refresh-day-cache-button">
                 🔄 Atualizar Dia Atual
             </button>
-            <button type="button" class="btn btn-danger ml-2" id="refresh-month-cache-button">
-                🔄 Atualizar Mês Todo
-            </button>
         </form>
 
         <div id="loading-overlay">
@@ -236,7 +233,6 @@
             var loadingOverlay = document.getElementById('loading-overlay');
             var searchButton = document.getElementById('search-button');
             var agendaForm = document.getElementById('agenda-form');
-            var refreshMonthCacheButton = document.getElementById('refresh-month-cache-button');
             var customModalOverlay = document.getElementById('custom-modal-overlay');
             var customModalTitle = document.getElementById('custom-modal-title');
             var customModalCloseButton = document.getElementById('custom-modal-close-button');
@@ -280,40 +276,7 @@
                 });
             }
 
-            if (refreshMonthCacheButton) {
-                refreshMonthCacheButton.addEventListener('click', function() {
-                    if (confirm('ATENÇÃO: Isso irá atualizar o cache de TODOS os dias do mês atual. Pode levar VÁRIOS minutos e gerar muitas requisições à API. Deseja continuar?')) {
-                        loadingOverlay.style.display = 'flex';
-                        loadingOverlay.style.opacity = '1';
-                        document.getElementById('loading-message').textContent = 'Atualizando dados do mês todo... POR FAVOR, AGUARDE...'; 
-
-                        fetch('/force_update_month_cache', { // Nova rota
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded', // Pode ser vazio ou enviar uma data dummy se quiser
-                            },
-                            body: '' // Não precisa enviar uma data específica, a rota usará date.today()
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.status === 'success') {
-                                alert(data.message);
-                                // Após atualizar o mês, é bom recarregar para ver os dados mais frescos
-                                window.location.reload(); 
-                            } else {
-                                alert('Erro ao atualizar cache do mês: ' + (data.message || 'Desconhecido'));
-                                loadingOverlay.style.display = 'none';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Erro na requisição de atualização do mês:', error);
-                            alert('Erro de rede ou servidor ao tentar atualizar o mês. Verifique o console.');
-                            loadingOverlay.style.display = 'none';
-                        });
-                    }
-                });
-            }
-
+            
             // --- Lógica para o Overlay de Carregamento na SUBMISSÃO do formulário ---
             if (agendaForm && searchButton && loadingOverlay) {
                 agendaForm.addEventListener('submit', function(event) {

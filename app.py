@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from cache_manager import save_agendas_to_cache, load_agendas_from_cache, delete_day_from_cache
 from update_cache_script import update_period_cache # Importa a nova função
+from threading import Thread
 from datetime import date, timedelta
 import pandas as pd
 import requests # Manter requests aqui para as funções que fazem chamadas diretas
@@ -298,24 +299,41 @@ def force_update_day_cache():
     return jsonify({"status": "success", "message": "Cache do dia limpo e atualização forçada iniciada.", "redirect_date": selected_date_str})
 
 
-@app.route('/force_update_month_cache', methods=['POST'])
+# Crie uma função "wrapper" que será o alvo da nossa thread
+def run_update_in_background(app_context, start_date, end_date):
+    """Garante que a tarefa de background tenha o contexto da aplicação Flask."""
+    with app_context:
+        print("Thread de atualização de cache iniciada em background.")
+        update_period_cache(start_date, end_date)
+        print("Thread de atualização de cache finalizada.")
+
+@app.route('/force_update_month_cache')
 def force_update_month_cache():
-    # Define o período para atualização: do dia atual até o final do mês.
     today = date.today()
-    last_day_of_month = date(today.year, today.month, 1) + timedelta(days=32) # Próximo mês + 2 dias para garantir
-    last_day_of_month = last_day_of_month.replace(day=1) - timedelta(days=1) # Volta para o último dia do mês atual
+    first_day_of_month = date(today.year, today.month, 1)
+
+    if today.month == 12:
+        next_month = date(today.year + 1, 1, 1)
+    else:
+        next_month = date(today.year, today.month + 1, 1)
     
-    # Limpa o cache do mês inteiro para forçar uma recarga completa
-    # Nota: delete_day_from_cache opera por dia. Se quiser apagar o arquivo do mês, você precisaria
-    # re-adicionar ou ajustar a clear_cache_for_month original em cache_manager e chamar aqui.
-    # Por enquanto, ele vai re-processar e sobrescrever cada dia.
+    last_day_of_month = next_month - timedelta(days=1)
     
-    # Chama a função de atualização para o período
-    # Você pode passar 'today' e 'last_day_of_month' como start/end_date
-    # Ou 'today' e 'today + timedelta(days=X)' se preferir X dias a partir de hoje
-    update_period_cache(today, last_day_of_month) 
+    # --- MUDANÇA PRINCIPAL ---
+    # 1. Crie uma thread para executar a tarefa pesada em background.
+    #    Passamos o app.app_context() para garantir que a thread funcione corretamente.
+    thread = Thread(
+        target=run_update_in_background, 
+        args=(app.app_context(), first_day_of_month, last_day_of_month)
+    )
+    # 2. Inicie a thread. Ela começará a rodar imediatamente.
+    thread.start()
     
-    return jsonify({"status": "success", "message": "Atualização do cache do mês iniciada. Isso pode levar alguns minutos."})
+    # 3. Retorne a resposta IMEDIATAMENTE para o usuário, sem esperar a tarefa terminar.
+    return jsonify({
+        "status": "success", 
+        "message": "Atualizacao do cache do mes iniciada em background. Isso pode levar alguns minutos."
+    })
 
 
 
