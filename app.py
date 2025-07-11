@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from cache_manager import save_agendas_to_cache, load_agendas_from_cache, delete_day_from_cache
 from update_cache_script import update_period_cache # Importa a nova função
+from update_cache_script import process_and_cache_day
 from threading import Thread
 from datetime import date, timedelta
 import pandas as pd
@@ -288,16 +289,27 @@ def appointment_details_api(appointment_id):
     else:
         return jsonify({"error": "Agendamento não encontrado ou erro na API"}), 404
 
-@app.route('/force_update_day_cache', methods=['POST']) # Renomeado para clareza
+# Substitua COMPLETAMENTE a sua rota /force_update_day_cache por esta nova versão
+@app.route('/force_update_day_cache', methods=['POST'])
 def force_update_day_cache():
     selected_date_str = request.form.get('selected_date_force_update', date.today().strftime('%Y-%m-%d'))
     selected_date = date.fromisoformat(selected_date_str)
     
-    delete_day_from_cache(selected_date)
+    # Não vamos mais deletar o cache aqui. A própria função de atualização irá sobrescrevê-lo.
     
-    # Redireciona para a página principal para que ela recarregue os dados (agora da API)
-    return jsonify({"status": "success", "message": "Cache do dia limpo e atualização forçada iniciada.", "redirect_date": selected_date_str})
-
+    # 1. Crie uma thread para executar a tarefa em background.
+    thread = Thread(
+        target=run_single_day_update_in_background, 
+        args=(app.app_context(), selected_date)
+    )
+    # 2. Inicie a thread.
+    thread.start()
+    
+    # 3. Retorne a resposta IMEDIATAMENTE para o usuário.
+    return jsonify({
+        "status": "success", 
+        "message": f"A atualização para o dia {selected_date.strftime('%d/%m/%Y')} foi iniciada em segundo plano. A página será recarregada em alguns segundos para exibir os novos dados."
+    })
 
 # Crie uma função "wrapper" que será o alvo da nossa thread
 def run_update_in_background(app_context, start_date, end_date):
@@ -334,6 +346,15 @@ def force_update_month_cache():
         "status": "success", 
         "message": "Atualizacao do cache do mes iniciada em background. Isso pode levar alguns minutos."
     })
+
+
+def run_single_day_update_in_background(app_context, target_date):
+    """Garante que a tarefa de background para um dia tenha o contexto da aplicação."""
+    with app_context:
+        print(f"Thread de atualização de cache para o dia {target_date} iniciada em background.")
+        # Chama a função que já existe no seu script para fazer o trabalho pesado
+        process_and_cache_day(target_date)
+        print(f"Thread de atualização para o dia {target_date} finalizada.")
 
 
 

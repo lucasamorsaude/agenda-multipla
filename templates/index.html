@@ -236,21 +236,20 @@
             var customModalOverlay = document.getElementById('custom-modal-overlay');
             var customModalTitle = document.getElementById('custom-modal-title');
             var customModalCloseButton = document.getElementById('custom-modal-close-button');
+            
 
-
-            // --- Lógica para o Botão de Atualizar Cache do Dia ---
-            var refreshDayCacheButton = document.getElementById('refresh-day-cache-button'); // ID alterado
+            var refreshDayCacheButton = document.getElementById('refresh-day-cache-button');
 
             if (refreshDayCacheButton) {
                 refreshDayCacheButton.addEventListener('click', function() {
-                    if (confirm('Tem certeza que deseja atualizar os dados do dia atual agora? Isso pode levar alguns segundos.')) {
+                    if (confirm('Tem certeza que deseja forçar a atualização dos dados do dia? A página será recarregada automaticamente após a conclusão.')) {
                         loadingOverlay.style.display = 'flex';
                         loadingOverlay.style.opacity = '1';
-                        document.getElementById('loading-message').textContent = 'Atualizando dados do dia...'; 
+                        document.getElementById('loading-message').textContent = 'Iniciando atualização em segundo plano...'; 
 
                         var currentDate = document.getElementById('selected_date').value;
 
-                        fetch('/force_update_day_cache', { // Rota alterada
+                        fetch('/force_update_day_cache', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -258,24 +257,36 @@
                             body: 'selected_date_force_update=' + currentDate 
                         })
                         .then(response => response.json())
+                        // SUBSTITUA O CONTEÚDO DO .then() POR ESTE BLOCO ABAIXO
                         .then(data => {
                             if (data.status === 'success') {
+                                // 1. Informa o usuário com a mensagem do servidor
                                 alert(data.message);
-                                window.location.reload(); 
+                                
+                                // 2. Mantém o overlay de carregamento, mas atualiza a mensagem
+                                document.getElementById('loading-message').textContent = 'Aguardando a atualização ser concluída... A página recarregará em breve.';
+                                
+                                // 3. Define um tempo de espera (ex: 20 segundos) antes de recarregar a página
+                                // Este tempo dá margem para a thread no servidor buscar e salvar os novos dados.
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 20000); // 20000 milissegundos = 20 segundos
                             } else {
-                                alert('Erro ao atualizar cache do dia: ' + (data.message || 'Desconhecido'));
+                                // Em caso de erro, esconde o overlay e mostra a mensagem
+                                alert('Erro ao iniciar a atualização: ' + (data.message || 'Desconhecido'));
                                 loadingOverlay.style.display = 'none';
                             }
                         })
                         .catch(error => {
                             console.error('Erro na requisição de atualização do dia:', error);
-                            alert('Erro de rede ou servidor ao tentar atualizar o dia. Verifique o console.');
+                            alert('Erro de rede ou servidor ao tentar atualizar. Verifique o console.');
                             loadingOverlay.style.display = 'none';
                         });
                     }
                 });
             }
 
+            
             
             // --- Lógica para o Overlay de Carregamento na SUBMISSÃO do formulário ---
             if (agendaForm && searchButton && loadingOverlay) {
