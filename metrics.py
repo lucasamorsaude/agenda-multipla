@@ -143,7 +143,7 @@ def calculate_conversion_rate_for_date(target_date, get_all_professionals_func, 
         for slot in slots:
             final_status = slot.get('appointmentStatus', slot.get('status', 'Indefinido')) 
             
-            if final_status in ["Atendido", "Atendido pós-consulta","Não compareceu pós-consulta"]: 
+            if final_status in ["Atendido", "Atendido pós-consulta","Não compareceu pós-consulta","Aguardando pós-consulta"]: 
                 prof_atendidos += 1
             
             is_encaixe = slot.get('encaixe', False) 
