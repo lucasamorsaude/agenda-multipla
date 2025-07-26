@@ -6,19 +6,15 @@ import tempfile
 CACHE_DIR = 'cache'
 CACHE_FILE_TEMPLATE = '{}/agendas_cache_{}.json' # cache/agendas_cache_YYYY-MM.json
 
-def _get_cache_file_path(target_date: date):
-    """Retorna o caminho completo do arquivo de cache para o mês da data alvo."""
+def _get_cache_file_path(target_date: date, unit_id: str):
+    """Retorna o caminho completo do arquivo de cache para o mês da data alvo e unidade."""
     month_year = target_date.strftime('%Y-%m')
-    os.makedirs(CACHE_DIR, exist_ok=True) # Garante que o diretório 'cache' exista
-    return CACHE_FILE_TEMPLATE.format(CACHE_DIR, month_year)
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    # Inclui o unit_id no nome do arquivo
+    return CACHE_FILE_TEMPLATE.format(CACHE_DIR, unit_id, month_year)
 
-def save_agendas_to_cache(day_data: dict, target_date: date):
-    """
-    Salva ou atualiza os dados de um dia específico no arquivo de cache do mês.
-    'day_data' deve conter todas as informações processadas para aquele dia.
-    Implementa escrita atômica para evitar arquivos corrompidos.
-    """
-    file_path = _get_cache_file_path(target_date)
+def save_agendas_to_cache(day_data: dict, target_date: date, unit_id: str):
+    file_path = _get_cache_file_path(target_date, unit_id)
     month_cache = {}
 
     # Tenta carregar o cache existente para o mês
@@ -56,12 +52,8 @@ def save_agendas_to_cache(day_data: dict, target_date: date):
             os.remove(temp_file_path)
     # --- Fim da escrita atômica ---
 
-def load_agendas_from_cache(target_date: date) -> dict | None:
-    """
-    Carrega os dados de um dia específico do arquivo de cache para o mês.
-    Retorna o dicionário de dados para o dia, ou None se o arquivo/dia não existir ou houver erro.
-    """
-    file_path = _get_cache_file_path(target_date)
+def load_agendas_from_cache(target_date: date, unit_id: str) -> dict | None:
+    file_path = _get_cache_file_path(target_date, unit_id)
     if not os.path.exists(file_path):
         print(f"Arquivo de cache para o mês {target_date.strftime('%Y-%m')} não encontrado: {file_path}")
         return None
@@ -87,11 +79,8 @@ def load_agendas_from_cache(target_date: date) -> dict | None:
         print(f"Erro ao ler arquivo de cache {file_path}: {e}")
         return None
 
-def delete_day_from_cache(target_date: date):
-    """
-    Remove os dados de um dia específico do arquivo de cache do mês.
-    """
-    file_path = _get_cache_file_path(target_date)
+def delete_day_from_cache(target_date: date, unit_id: str):
+    file_path = _get_cache_file_path(target_date, unit_id)
     day_key = target_date.strftime('%Y-%m-%d')
     month_cache = {}
 

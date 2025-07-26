@@ -6,8 +6,6 @@ import os
 
 # 1. Definições da Requisição
 LOGIN_URL = 'https://amei.amorsaude.com.br/api/v1/security/login'
-REFRESH_URL = 'https://amei.amorsaude.com.br/api/v1/security/refresh-token?clinicId=932'
-
 
 CREDENTIALS_FILE = 'credentials.json'
 
@@ -40,7 +38,10 @@ LOGIN_PAYLOAD = {
     'keepConnected': True
 }
 
-def get_auth_new():
+def get_auth_new(clinic_id):
+    # Crie a URL dinamicamente
+    refresh_url = f'https://amei.amorsaude.com.br/api/v1/security/refresh-token?clinicId={clinic_id}'
+
     # 2. Início do Teste
     print("="*60)
     print("INICIANDO AUTENTICAÇÃO EM 2 PASSOS")
@@ -67,7 +68,7 @@ def get_auth_new():
 
     try:
         # --- MUDANÇA PRINCIPAL AQUI: de requests.get para requests.post ---
-        refresh_response = requests.post(REFRESH_URL, headers=preliminary_headers)
+        refresh_response = requests.post(refresh_url, headers=preliminary_headers)
         refresh_response.raise_for_status()
 
         refresh_data = refresh_response.json()

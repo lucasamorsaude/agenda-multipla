@@ -13,7 +13,7 @@
     --button-info-bg: #3f51b5; /* Azul mais escuro para botões info */
     --button-info-hover-bg: #303f9f;
     --table-header-bg: #333333; /* Fundo do cabeçalho da tabela */
-    --table-stripe-bg: #222222; /* Cor da faixa da tabela */
+    --table-stripe-bg: #d4d4d4; /* Cor da faixa da tabela */
 }
 
 body {

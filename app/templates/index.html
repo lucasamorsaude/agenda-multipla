@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Agendas - {{ session['unidades'][session['selected_unit_id']] }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .agenda-card { border: none; box-shadow: 0 4px 8px rgba(0,0,0,0.08); height: 100%; }
+        .agenda-header { background-color: #0d6efd; color: white; font-weight: bold; }
+        .slot { padding: 0.5rem; margin-bottom: 0.5rem; border-radius: 0.3rem; font-size: 0.85rem; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid rgba(0,0,0,0.1); }
+        .slot:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .metric-card { margin-bottom: 1.5rem; border-left: 5px solid #0d6efd; }
+        .horizontal-scroll-container { display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 1.5rem; }
+        .agenda-column { flex: 0 0 320px; max-width: 320px; padding-left: 0.75rem; padding-right: 0.75rem; }
+        .progress { height: 20px; font-size: 0.8rem; }
+        .details-list-group-item { background-color: #f8f9fa; border-color: rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
+        <div id="updateToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true"><div class="toast-header"><strong class="me-auto">Atualização de Cache</strong><button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button></div><div class="toast-body" id="toast-body-message"></div></div>
+    </div>
+
+    <div class="container-fluid my-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div><h3>Dashboard de Agendas</h3><h5 class="text-muted">{{ session['unidades'][session['selected_unit_id']] }}</h5></div>
+            <div>
+                {% if session.get('role') == 'admin' %}
+                    <a href="{{ url_for('admin.admin_panel') }}" class="btn btn-warning">Admin</a>
+                {% endif %}
+                <a href="{{ url_for('auth.select_unit') }}" class="btn btn-secondary">Trocar Unidade</a>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-danger ms-2">Sair</a>
+            </div>
+        </div>
+        <div class="card mb-4"><div class="card-body d-flex justify-content-between align-items-center"><form method="POST" action="{{ url_for('main.index') }}" class="d-flex align-items-center"><label for="selected_date" class="form-label me-2 mb-0">Selecione a Data:</label><input type="date" id="selected_date" name="selected_date" value="{{ selected_date }}" class="form-control me-2" style="width: auto;"><button type="submit" class="btn btn-primary">Ver Agenda</button></form><form id="force-update-form"><input type="hidden" name="selected_date_force_update" value="{{ selected_date }}"><button type="submit" class="btn btn-outline-warning">Forçar Atualização do Dia</button></form></div></div>
+        
+        <div class="row mb-3">
+            <h4 class="mb-3">Resumo do Dia</h4>
+            <div class="col-lg-3 col-md-6"><div class="card metric-card"><div class="card-body"><h6 class="card-subtitle mb-2 text-muted">Total Agendado</h6><h4 class="card-title">{{ summary_metrics.total_agendado_geral }}</h4></div></div></div>
+            <div class="col-lg-3 col-md-6"><div class="card metric-card" style="border-left-color: #198754;"><div class="card-body"><h6 class="card-subtitle mb-2 text-muted">Taxa de Confirmação</h6><h4 class="card-title">{{ summary_metrics.percentual_confirmacao }}</h4><small>({{ summary_metrics.total_confirmado_geral }} confirmados)</small></div></div></div>
+            <div class="col-lg-3 col-md-6"><div class="card metric-card" style="border-left-color: #ffc107;"><div class="card-body"><h6 class="card-subtitle mb-2 text-muted">Taxa de Ocupação</h6><h4 class="card-title">{{ summary_metrics.percentual_ocupacao }}</h4><small>({{ summary_metrics.total_ocupados }} de {{ summary_metrics.total_slots_disponiveis }})</small></div></div></div>
+            <div class="col-lg-3 col-md-6"><div class="card metric-card" style="border-left-color: #fd7e14;"><div class="card-body"><h6 class="card-subtitle mb-2 text-muted">Taxa de Conversão</h6><h4 class="card-title">{{ conversion_data_for_selected_day.conversion_rate }}</h4><small>({{ conversion_data_for_selected_day.total_atendidos }} atendidos)</small></div></div></div>
+        </div>
+
+        <div class="mb-4">
+            <p><button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRankings" aria-expanded="false" aria-controls="collapseRankings">Mostrar/Ocultar Rankings de Profissionais</button></p>
+            <div class="collapse show" id="collapseRankings">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5>Confirmação por Profissional</h5>
+                        <ul class="list-group">
+                            {% for prof in profissionais_stats_confirmacao %}
+                            <li class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ prof.profissional }}</h6>
+                                <small>{{ prof.taxa_confirmacao }}</small>
+                                </div>
+                                {% set percent = prof['percent_numeric'] %}
+                                {% set color_class = 'bg-success' if percent >= 80 else 'bg-warning' if percent >= 60 else 'bg-danger' %}
+                                <div class="progress mt-1">
+                                    <div class="progress-bar {{ color_class }}" role="progressbar" style="width: {{ percent }}%;" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100">{{ prof.taxa_confirmacao }}</div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="col-md-4">
+                        <h5>Ocupação por Profissional</h5>
+                        <ul class="list-group">
+                            {% for prof in profissionais_stats_ocupacao %}
+                            <li class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ prof.profissional }}</h6>
+                                <small>{{ prof.taxa_ocupacao }}</small>
+                                </div>
+                                {% set percent = prof['percent_numeric'] %}
+                                {% set color_class = 'bg-success' if percent >= 80 else 'bg-warning' if percent >= 60 else 'bg-danger' %}
+                                <div class="progress mt-1">
+                                    <div class="progress-bar {{ color_class }}" role="progressbar" style="width: {{ percent }}%;" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100">{{ prof.taxa_ocupacao }}</div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="col-md-4">
+                        <h5>Conversão por Profissional</h5>
+                        <ul class="list-group">
+                            {% for prof in profissionais_stats_conversao %}
+                            <li class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ prof.profissional }}</h6>
+                                <small>{{ prof.taxa_conversao }}</small>
+                                </div>
+                                {% set percent = prof['percent_numeric'] %}
+                                {% set color_class = 'bg-success' if percent >= 80 else 'bg-warning' if percent >= 60 else 'bg-danger' %}
+                                <div class="progress mt-1">
+                                    <div class="progress-bar {{ color_class }}" role="progressbar" style="width: {{ percent }}%;" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100">{{ prof.taxa_conversao }}</div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h4 class="mb-3">Agendas dos Profissionais</h4>
+        <div class="horizontal-scroll-container">
+            {% if agendas %}
+                {% for profissional, agenda_data in agendas.items() %}
+                <div class="agenda-column">
+                    <div class="card agenda-card">
+                        <div class="card-header agenda-header"><a href="{{ agenda_url_template.format(agenda_data.id, selected_date) }}" target="_blank" class="text-white text-decoration-none">{{ profissional }}</a></div>
+                        <div class="card-body">
+                            {% for slot in agenda_data.horarios %}
+                            <div class="slot" style="{{ status_styles.get(slot.status, status_styles.default) }}" 
+                                 data-bs-toggle="tooltip" data-bs-placement="top" title="Clique para ver detalhes" 
+                                 onclick="fetchDetails('{{ slot.appointmentId }}', '{{ slot.patientId }}')">
+                                <strong>{{ slot.formatedHour }}</strong> - {{ slot.status }}<br>
+                                <small><strong>{{ slot.patient if slot.patient else 'Disponível' }}</strong></small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12"><div class="alert alert-info">Nenhuma agenda com horários ativos para a data selecionada.</div></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title" id="detailsModalLabel">Detalhes</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                <div class="modal-body" id="modalBodyContent"><p>Carregando...</p></div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Inicializa os tooltips do Bootstrap
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) { return new bootstrap.Tooltip(tooltipTriggerEl); });
+        
+        // --- Lógica do Modal de Detalhes ---
+        const detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+        const modalBody = document.getElementById('modalBodyContent');
+        const modalTitle = document.getElementById('detailsModalLabel');
+
+        async function fetchDetails(appointmentId, patientId) {
+            if (!appointmentId && !patientId) return;
+            modalTitle.textContent = "Carregando Detalhes...";
+            modalBody.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+            detailsModal.show();
+            let appointmentData = null, patientData = null;
+            if (appointmentId) { try { const response = await fetch(`/api/appointment_details/${appointmentId}`); if (response.ok) appointmentData = await response.json(); } catch (e) { console.error("Erro no fetch do agendamento:", e); } }
+            if (patientId) { try { const response = await fetch(`/api/patient_details/${patientId}`); if (response.ok) patientData = await response.json(); } catch (e) { console.error("Erro no fetch do paciente:", e); } }
+            
+            let finalHtml = '';
+            if (appointmentData) {
+                const proc = appointmentData.agendamentosProcedimentos[0] || {}; const prof = appointmentData.profissionalId || {}; const hist = appointmentData.historicos[0] || {}; const parceiro = appointmentData.parceiroId || {};
+                const dataAgendamento = new Date(appointmentData.createAt).toLocaleString('pt-BR');
+                finalHtml += `<h5><i class="bi bi-calendar-check-fill text-primary"></i> Detalhes do Agendamento</h5><ul class="list-group list-group-flush mb-4">`;
+                finalHtml += `<li class="list-group-item details-list-group-item d-flex justify-content-between align-items-center"><strong>Procedimento:</strong> <span>${proc.descricao || 'N/A'}</span></li>`;
+                finalHtml += `<li class="list-group-item details-list-group-item d-flex justify-content-between align-items-center"><strong>Profissional:</strong> <span>${prof.titulo || ''} ${prof.nome || ''} ${prof.sobrenome || ''}</span></li>`;
+                finalHtml += `<li class="list-group-item details-list-group-item d-flex justify-content-between align-items-center"><strong>Valor:</strong> <span>R$ ${proc.valor ? proc.valor.toFixed(2).replace('.',',') : '0,00'}</span></li>`;
+                finalHtml += `<li class="list-group-item details-list-group-item d-flex justify-content-between align-items-center"><strong>Agendado por:</strong> <span>${hist.atualizadoPor || 'N/A'}</span></li>`;
+                finalHtml += `<li class="list-group-item details-list-group-item d-flex justify-content-between align-items-center"><strong>Data do Agendamento:</strong> <span>${dataAgendamento}</span></li>`;
+                finalHtml += `<li class="list-group-item details-list-group-item d-flex justify-content-between align-items-center"><strong>Parceiro:</strong> <span>${parceiro.nome || 'N/A'}</span></li></ul>`;
+            }
+            if (patientData) {
+                const convenio = patientData.pacienteConvenioPlano[0] || {}; const dataNasc = new Date(patientData.dataNascimento).toLocaleDateString('pt-BR', {timeZone: 'UTC'});
+                modalTitle.textContent = `Detalhes de ${patientData.nome || 'Paciente'}`;
+                finalHtml += `<h5><i class="bi bi-person-fill text-primary"></i> Detalhes do Paciente</h5><ul class="list-group list-group-flush">`;
+                finalHtml += `<li class="list-group-item details-list-group-item d-flex justify-content-between align-items-center"><strong>Nome:</strong> <span>${patientData.nome} ${patientData.sobrenome}</span></li>`;
+                finalHtml += `<li class="list-group-item details-list-group-item d-flex justify-content-between align-items-center"><strong>Celular:</strong> <span>${patientData.celular || 'N/A'}</span></li>`;
+                finalHtml += `<li class="list-group-item details-list-group-item d-flex justify-content-between align-items-center"><strong>Email:</strong> <span>${patientData.email || 'N/A'}</span></li>`;
+                finalHtml += `<li class="list-group-item details-list-group-item d-flex justify-content-between align-items-center"><strong>Data de Nascimento:</strong> <span>${dataNasc}</span></li>`;
+                finalHtml += `<li class="list-group-item details-list-group-item d-flex justify-content-between align-items-center"><strong>CPF:</strong> <span>${patientData.cpf || 'N/A'}</span></li>`;
+                finalHtml += `<li class="list-group-item details-list-group-item d-flex justify-content-between align-items-center"><strong>Matrícula Convênio:</strong> <span>${convenio.carteirinha || 'N/A'}</span></li></ul>`;
+            }
+            modalBody.innerHTML = finalHtml || '<p class="text-center">Não foi possível carregar os detalhes.</p>';
+        }
+        
+        // --- LÓGICA PARA FORÇAR ATUALIZAÇÃO (NOVO) ---
+        const toastEl = document.getElementById('updateToast');
+        const toast = new bootstrap.Toast(toastEl);
+        const toastBody = document.getElementById('toast-body-message');
+
+        document.getElementById('force-update-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const button = this.querySelector('button');
+            const originalButtonText = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Atualizando...';
+            
+            const formData = new FormData(this);
+
+            fetch("{{ url_for('cache.force_update_day_cache_sync') }}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                toastBody.textContent = data.message;
+                toast.show();
+                // Recarrega a página para mostrar os dados atualizados
+                if (data.status === 'success') {
+                    setTimeout(() => { window.location.reload(); }, 2000); // Espera 2s antes de recarregar
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao forçar atualização:', error);
+                toastBody.textContent = 'Erro de comunicação ao tentar atualizar.';
+                toast.show();
+            })
+            .finally(() => {
+                // Restaura o botão após um tempo para o usuário ver a mensagem
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = originalButtonText;
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
