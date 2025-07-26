@@ -1181,17 +1181,17 @@
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
                         "appointmentId": 17121881,
-                        "appointmentStatus": "Em atendimento",
+                        "appointmentStatus": "Aguardando pós-consulta",
                         "hasCanceledAppointments": false,
                         "patient": "MARIA DE FATIMA PEREIRA DE OLIVEIRA",
                         "encaixe": false,
                         "patientId": 17960347,
-                        "statusId": 10,
+                        "statusId": 14,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 727806,
                         "interval": 15,
-                        "status": "Em atendimento",
+                        "status": "Aguardando pós-consulta",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 33322,
@@ -1431,17 +1431,17 @@
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
                         "appointmentId": 17165150,
-                        "appointmentStatus": "Atendimento pausado",
+                        "appointmentStatus": "Aguardando pós-consulta",
                         "hasCanceledAppointments": false,
                         "patient": "RAQUEL PIRES DE ANDRADE",
                         "encaixe": false,
                         "patientId": 4034053,
-                        "statusId": 199,
+                        "statusId": 14,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 727806,
                         "interval": 15,
-                        "status": "Atendimento pausado",
+                        "status": "Aguardando pós-consulta",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 33322,
@@ -1517,26 +1517,63 @@
                 "Atendido pós-consulta": 7,
                 "Marcado - confirmado": 1,
                 "Bloqueado": 2,
-                "Em atendimento": 1,
-                "Aguardando pós-consulta": 6,
-                "Atendimento pausado": 1
+                "Aguardando pós-consulta": 8
             }
         },
         "summary_metrics": {
-            "total_agendado_geral": 0,
-            "percentual_confirmacao": "0%",
-            "total_confirmado_geral": 0,
-            "percentual_ocupacao": "0%",
-            "total_ocupados": 0,
-            "total_slots_disponiveis": 0
+            "total_agendado_geral": 60,
+            "total_confirmado_geral": 1,
+            "percentual_confirmacao": "1.67%",
+            "total_ocupados": 50,
+            "total_slots_disponiveis": 60,
+            "percentual_ocupacao": "83.33%"
         },
-        "profissionais_stats_confirmacao": [],
-        "profissionais_stats_ocupacao": [],
-        "profissionais_stats_conversao": [],
         "conversion_data_for_selected_day": {
-            "conversion_rate": "0.00%",
-            "total_atendidos": 0
-        }
+            "conversion_rate": "100.00%",
+            "total_atendidos": 22
+        },
+        "profissionais_stats_confirmacao": [
+            {
+                "profissional": "Lívia ",
+                "taxa_confirmacao": "6.25%"
+            },
+            {
+                "profissional": "Zaida",
+                "taxa_confirmacao": "0.00%"
+            },
+            {
+                "profissional": "Vancleia ",
+                "taxa_confirmacao": "0.00%"
+            }
+        ],
+        "profissionais_stats_ocupacao": [
+            {
+                "profissional": "Vancleia ",
+                "taxa_ocupacao": "100.00%"
+            },
+            {
+                "profissional": "Lívia ",
+                "taxa_ocupacao": "88.89%"
+            },
+            {
+                "profissional": "Zaida",
+                "taxa_ocupacao": "73.33%"
+            }
+        ],
+        "profissionais_stats_conversao": [
+            {
+                "profissional": "Zaida",
+                "taxa_conversao": "100.00%"
+            },
+            {
+                "profissional": "Lívia ",
+                "taxa_conversao": "100.00%"
+            },
+            {
+                "profissional": "Vancleia ",
+                "taxa_conversao": "100.00%"
+            }
+        ]
     },
     "2025-07-28": {
         "agendas": {

@@ -47,6 +47,44 @@
         </div>
 
         <div class="mb-4">
+            <p>
+                <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseResumoGeral" aria-expanded="false" aria-controls="collapseResumoGeral">
+                    <i class="bi bi-table"></i> Mostrar/Ocultar Resumo Geral
+                </button>
+            </p>
+            <div class="collapse" id="collapseResumoGeral">
+                <div class="card card-body">
+                    {% if table_headers %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Status</th> 
+                                        {% for header in table_headers %}
+                                            <th scope="col">{{ header }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in range(table_index|length) %}
+                                    <tr>
+                                        <th scope="row">{{ table_index[i] }}</th>
+                                        {% for cell in table_body[i] %}
+                                            <td>{{ cell }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p>Não há dados de resumo para exibir.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
             <p><button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRankings" aria-expanded="false" aria-controls="collapseRankings">Mostrar/Ocultar Rankings de Profissionais</button></p>
             <div class="collapse show" id="collapseRankings">
                 <div class="row">

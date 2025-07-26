@@ -37,7 +37,7 @@ STATUS_STYLES = {
 def _get_default_context():
     """Retorna o contexto inicial para evitar erros no template."""
     return {
-        "agendas": {}, "resumo_geral": {},
+        "agendas": {}, "resumo_geral": {}, "resumo_html": "", "table_headers": [], "table_index": [], "table_body": [],
         "summary_metrics": {"total_agendado_geral": 0, "percentual_confirmacao": "0%", "total_confirmado_geral": 0, "percentual_ocupacao": "0%", "total_ocupados": 0, "total_slots_disponiveis": 0},
         "profissionais_stats_confirmacao": [], "profissionais_stats_ocupacao": [], "profissionais_stats_conversao": [],
         "conversion_data_for_selected_day": {"conversion_rate": "0.00%", "total_atendidos": 0}
@@ -111,6 +111,24 @@ def index():
         context["profissionais_stats_confirmacao"] = calculate_confirmation_ranking(df_resumo.copy())
         context["profissionais_stats_ocupacao"] = calculate_occupation_ranking(df_resumo.copy())
         context["profissionais_stats_conversao"] = calculate_conversion_ranking(df_resumo.copy())
+
+        if not df_resumo.empty:
+            df_pivot = df_resumo.T
+            
+            total_agendado = {}
+            for profissional in df_pivot.columns:
+                total_slots = df_pivot[profissional].sum()
+                livres = df_pivot.loc['Livre', profissional] if 'Livre' in df_pivot.index else 0
+                bloqueados = df_pivot.loc['Bloqueado', profissional] if 'Bloqueado' in df_pivot.index else 0
+                total_agendado[profissional] = int(total_slots - livres - bloqueados)
+            
+            df_pivot.loc['Total Agendado'] = pd.Series(total_agendado)
+            
+            # --- AQUI ESTÁ A MUDANÇA PRINCIPAL ---
+            # Em vez de gerar HTML, preparamos os dados para o Jinja2
+            context['table_headers'] = df_pivot.columns.tolist()
+            context['table_index'] = df_pivot.index.tolist()
+            context['table_body'] = df_pivot.values.tolist()
 
     # Prepara os dados para as barras de progresso
     context["profissionais_stats_confirmacao"] = _prepare_ranking_data(context.get("profissionais_stats_confirmacao", []), 'taxa_confirmacao')
