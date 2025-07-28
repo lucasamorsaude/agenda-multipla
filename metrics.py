@@ -84,10 +84,21 @@ def calculate_global_conversion_rate(df):
 
     if 'Atendido' not in df.columns: df['Atendido'] = 0
     if 'Atendido pós-consulta' not in df.columns: df['Atendido pós-consulta'] = 0
-    if 'Não compareceu' not in df.columns: df['Não compareceu'] = 0
+    if 'Não compareceu' not in df.columns: df['Não compareceu'] = 0  #Check
 
-    total_atendidos = df['Atendido'].sum() + df['Atendido pós-consulta'].sum()
-    total_nao_compareceu = df['Não compareceu'].sum()
+    if 'Livre' not in df.columns: df['Livre'] = 0   #Check
+    if 'Bloqueado' not in df.columns: df['Bloqueado'] = 0   #Check
+    if 'Marcado - confirmado' not in df.columns: df['Marcado - confirmado'] = 0   #Check
+    if 'Agendado' not in df.columns: df['Agendado'] = 0   #Check
+    if 'Encaixe' not in df.columns: df['Encaixe'] = 0   #Check
+    if 'Aguardando atendimento' not in df.columns: df['Aguardando atendimento'] = 0   #Check
+    if 'Em atendimento' not in df.columns: df['Em atendimento'] = 0   #Check
+    if 'Aguardando pós-consulta' not in df.columns: df['Aguardando pós-consulta'] = 0   #Check
+
+    total_atendidos = df['Atendido'].sum() + df['Atendido pós-consulta'].sum() + df['Aguardando pós-consulta'].sum()
+
+    total_nao_compareceu = df['Não compareceu'].sum() + df['Livre'].sum() + df['Bloqueado'].sum() + df['Marcado - confirmado'].sum() + df['Agendado'].sum() + df['Encaixe'].sum() + df['Aguardando atendimento'].sum() + df['Em atendimento'].sum()
+
     total_validos = total_atendidos + total_nao_compareceu
     taxa = (total_atendidos / total_validos * 100) if total_validos > 0 else 0
     
