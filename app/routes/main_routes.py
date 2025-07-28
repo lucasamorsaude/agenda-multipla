@@ -90,12 +90,29 @@ def index():
                         "horarios": sorted(slots, key=lambda x: x.get('numeric_hour', 0.0))
                     }
                     
-                    # Lógica correta para contar os status
+                    # --- LÓGICA DE CONTAGEM ATUALIZADA PARA ENVIAR AMBOS OS STATUS ---
                     contagem_status = {}
                     for slot in slots:
-                        status_atual = slot.get('status', 'Indefinido')
-                        contagem_status[status_atual] = contagem_status.get(status_atual, 0) + 1
+                        main_status = slot.get('status')
+                        app_status = slot.get('appointmentStatus')
+                        
+                        final_key = main_status # Define o status base
+                        
+                        # Se 'appointmentStatus' existir, ele representa o resultado final da consulta.
+                        # Se o slot for um 'Encaixe', preservamos essa informação.
+                        if app_status:
+                            if main_status == 'Encaixe':
+                                # Cria uma chave combinada, ex: "Encaixe (Atendido)"
+                                final_key = f"Encaixe ({app_status})"
+                            else:
+                                # Para agendamentos normais, o resultado final é o que importa
+                                final_key = app_status
+
+                        if final_key:
+                            contagem_status[final_key] = contagem_status.get(final_key, 0) + 1
+
                     context["resumo_geral"][prof_nome] = contagem_status
+                    
             if context.get("agendas"):
                 save_agendas_to_cache(context, selected_date, id_unidade_selecionada)
         else:

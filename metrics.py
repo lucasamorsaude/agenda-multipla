@@ -4,13 +4,20 @@ import pandas as pd
 
 def calculate_summary_metrics(resumo_geral, df_resumo):
     """Calcula as métricas de resumo para os cards principais."""
-    total_confirmado_geral = df_resumo.get("Marcado - confirmado", pd.Series(0)).sum()
+    
+    # --- LÓGICA DE CONFIRMAÇÃO AJUSTADA ---
+    # Encontra todas as colunas que contêm "Marcado - confirmado" no nome
+    colunas_confirmados = [col for col in df_resumo.columns if "Marcado - confirmado" in col]
+    # Soma os valores de todas essas colunas para obter o total real de confirmados
+    total_confirmado_geral = df_resumo[colunas_confirmados].sum().sum() if colunas_confirmados else 0
+
     total_agendado_geral = sum(sum(d.values()) for d in resumo_geral.values())
-    percentual_confirmacao = f"{(total_confirmado_geral / total_agendado_geral * 100):.2f}%" if total_agendado_geral > 0 else "0.00%"
     
     total_ocupados = total_agendado_geral - df_resumo.get("Livre", pd.Series(0)).sum() - df_resumo.get("Bloqueado", pd.Series(0)).sum()
     total_slots_disponiveis = total_agendado_geral
     percentual_ocupacao = f"{(total_ocupados / total_slots_disponiveis * 100):.2f}%" if total_slots_disponiveis > 0 else "0.00%"
+
+    percentual_confirmacao = f"{(total_confirmado_geral / total_ocupados * 100):.2f}%" if total_ocupados > 0 else "0.00%"
 
     total_agendado_geral = total_ocupados
     
