@@ -61,19 +61,21 @@ def process_and_cache_day(target_date: date, clinic_id: int):
     Processa os dados de agenda para um dia e unidade específicos e os salva no cache.
     Esta função agora é o "motor" que busca e calcula tudo.
     """
-    print(f"Processando e atualizando cache para a data: {target_date.strftime('%Y-%m-%d')} na unidade {clinic_id}")
+    print(f"--- [CACHE SCRIPT] Iniciando para data: {target_date.strftime('%Y-%m-%d')} | Unidade: {clinic_id} ---")
 
     # --- Configuração de Autenticação ---
     auth = get_auth_new(clinic_id)
     if not auth:
-        print(f"Erro Crítico [update_script]: Não foi possível obter token para a unidade {clinic_id}. Abortando.")
+        print(f"ERRO CRÍTICO [CACHE SCRIPT]: Falha ao obter token para unidade {clinic_id}. Abortando.")
         return
 
     try:
         with open('credentials.json', 'r') as f:
             cookie_value = json.load(f).get("cookie", "")
+            print("DEBUG [CACHE SCRIPT]: Cookie carregado de credentials.json")
     except (FileNotFoundError, json.JSONDecodeError):
         cookie_value = os.environ.get("COOKIE_VALUE", "")
+        print("DEBUG [CACHE SCRIPT]: Cookie carregado de variável de ambiente")
 
     HEADERS = {'Authorization': f"Bearer {auth}", 'Cookie': cookie_value}
 
@@ -82,8 +84,10 @@ def process_and_cache_day(target_date: date, clinic_id: int):
     all_profissionais = get_all_professionals_script(HEADERS)
     
     if not all_profissionais:
-        print("Nenhum profissional encontrado. Pulando atualização para este dia.")
+        print("AVISO [CACHE SCRIPT]: Nenhum profissional retornado pela API.")
         return
+    
+    print(f"DEBUG [CACHE SCRIPT]: Encontrados {len(all_profissionais)} profissionais.")
 
     for prof in all_profissionais:
         prof_id = prof.get('id')
@@ -96,14 +100,26 @@ def process_and_cache_day(target_date: date, clinic_id: int):
                 "id": prof_id,
                 "horarios": sorted(slots, key=lambda x: x.get('numeric_hour', 0.0))
             }
-            # Cria o resumo de status para o profissional
+            
+            # --- LÓGICA DE CONTAGEM CORRIGIDA (IGUAL AO MAIN_ROUTES.PY) ---
             contagem_status = {}
             for slot in slots:
-                status_atual = slot.get('status', 'Indefinido')
-                contagem_status[status_atual] = contagem_status.get(status_atual, 0) + 1
+                main_status = slot.get('status')
+                app_status = slot.get('appointmentStatus')
+                
+                final_key = main_status
+                if app_status:
+                    if main_status == 'Encaixe':
+                        final_key = f"Encaixe ({app_status})"
+                    else:
+                        final_key = app_status
+
+                if final_key:
+                    contagem_status[final_key] = contagem_status.get(final_key, 0) + 1
+            
             context["resumo_geral"][prof_nome] = contagem_status
 
-    # --- Cálculo de Métricas (usando as novas funções) ---
+    # --- Cálculo de Métricas ---
     if context["resumo_geral"]:
         df_resumo = pd.DataFrame.from_dict(context["resumo_geral"], orient='index').fillna(0).astype(int)
         
@@ -113,10 +129,13 @@ def process_and_cache_day(target_date: date, clinic_id: int):
         context["profissionais_stats_ocupacao"] = calculate_occupation_ranking(df_resumo.copy())
         context["profissionais_stats_conversao"] = calculate_conversion_ranking(df_resumo.copy())
 
+        # DEBUG: Imprime as métricas calculadas antes de salvar
+        total_atendidos_debug = context.get("conversion_data_for_selected_day", {}).get("total_atendidos", "N/A")
+        print(f"DEBUG [CACHE SCRIPT]: Métricas calculadas. Total de atendidos: {total_atendidos_debug}")
+
     # Salva o dicionário 'context' completo no cache
     save_agendas_to_cache(context, target_date, clinic_id)
-    print(f"Cache para {target_date.strftime('%Y-%m-%d')} na unidade {clinic_id} atualizado com sucesso.")
-
+    print(f"--- [CACHE SCRIPT] Cache para {target_date.strftime('%Y-%m-%d')} atualizado com sucesso. ---")
 
 def update_period_cache(start_date: date, end_date: date, clinic_id: int):
     """Atualiza o cache para um período de datas e uma unidade específica."""
