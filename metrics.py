@@ -11,6 +11,8 @@ def calculate_summary_metrics(resumo_geral, df_resumo):
     total_ocupados = total_agendado_geral - df_resumo.get("Livre", pd.Series(0)).sum() - df_resumo.get("Bloqueado", pd.Series(0)).sum()
     total_slots_disponiveis = total_agendado_geral
     percentual_ocupacao = f"{(total_ocupados / total_slots_disponiveis * 100):.2f}%" if total_slots_disponiveis > 0 else "0.00%"
+
+    total_agendado_geral = total_ocupados
     
     return {
         "total_agendado_geral": int(total_agendado_geral),
