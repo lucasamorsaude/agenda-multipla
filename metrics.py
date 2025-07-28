@@ -53,11 +53,22 @@ def calculate_conversion_ranking(df):
     # Adiciona colunas que podem não existir para evitar erros
     if 'Atendido' not in df.columns: df['Atendido'] = 0
     if 'Atendido pós-consulta' not in df.columns: df['Atendido pós-consulta'] = 0
-    if 'Não compareceu' not in df.columns: df['Não compareceu'] = 0
+    if 'Não compareceu' not in df.columns: df['Não compareceu'] = 0  #Check
+
+    if 'Livre' not in df.columns: df['Livre'] = 0   #Check
+    if 'Bloqueado' not in df.columns: df['Bloqueado'] = 0   #Check
+    if 'Marcado - confirmado' not in df.columns: df['Marcado - confirmado'] = 0   #Check
+    if 'Agendado' not in df.columns: df['Agendado'] = 0   #Check
+    if 'Encaixe' not in df.columns: df['Encaixe'] = 0   #Check
+    if 'Aguardando atendimento' not in df.columns: df['Aguardando atendimento'] = 0   #Check
+    if 'Em atendimento' not in df.columns: df['Em atendimento'] = 0   #Check
+    if 'Aguardando pós-consulta' not in df.columns: df['Aguardando pós-consulta'] = 0   #Check
     
     for prof, row in df.iterrows():
-        atendidos = row['Atendido'] + row['Atendido pós-consulta']
-        nao_compareceu = row['Não compareceu']
+        atendidos = row['Atendido'] + row['Atendido pós-consulta'] + row['Aguardando pós-consulta']
+
+        nao_compareceu = row['Não compareceu'] + row['Livre'] + row['Bloqueado'] + row['Marcado - confirmado'] + row['Agendado'] + row['Encaixe'] + row['Aguardando atendimento'] + row['Em atendimento']
+        
         total_validos = atendidos + nao_compareceu
         taxa = (atendidos / total_validos * 100) if total_validos > 0 else 0
         stats.append({
