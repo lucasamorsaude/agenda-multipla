@@ -10,7 +10,7 @@ def calculate_summary_metrics(resumo_geral, df_resumo):
     
     total_ocupados = total_agendado_geral - df_resumo.get("Livre", pd.Series(0)).sum() - df_resumo.get("Bloqueado", pd.Series(0)).sum()
     total_slots_disponiveis = total_agendado_geral
-    percentual_ocupacao = f"{(total_ocupados / total_ocupados * 100):.2f}%" if total_ocupados > 0 else "0.00%"
+    percentual_ocupacao = f"{(total_ocupados / total_slots_disponiveis * 100):.2f}%" if total_slots_disponiveis > 0 else "0.00%"
 
     total_agendado_geral = total_ocupados
     
@@ -99,7 +99,7 @@ def calculate_global_conversion_rate(df):
 
     total_atendidos = df['Atendido'].sum() + df['Atendido pós-consulta'].sum() + df['Aguardando pós-consulta'].sum()
 
-    total_nao_compareceu = df['Não compareceu'].sum() + df['Livre'].sum() + df['Bloqueado'].sum() + df['Marcado - confirmado'].sum() + df['Agendado'].sum() + df['Encaixe'].sum() + df['Aguardando atendimento'].sum() + df['Em atendimento'].sum()
+    total_nao_compareceu = df['Não compareceu'].sum() + df['Marcado - confirmado'].sum() + df['Agendado'].sum() + df['Encaixe'].sum() + df['Aguardando atendimento'].sum() + df['Em atendimento'].sum()
 
     total_validos = total_atendidos + total_nao_compareceu
     taxa = (total_atendidos / total_validos * 100) if total_validos > 0 else 0
