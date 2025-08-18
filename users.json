@@ -159,5 +159,12 @@
         "unidades": {
             "932": "São João del Rei - MG"
         }
+    },
+    "virginiar": {
+        "senha": "Amor@123",
+        "role": "user",
+        "unidades": {
+            "932": "São João del Rei - MG"
+        }
     }
 }
