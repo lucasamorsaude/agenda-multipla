@@ -152,5 +152,12 @@
         "unidades": {
             "1991": "Montenegro - PR"
         }
+    },
+    "biancaf": {
+        "senha": "Amor@100",
+        "role": "user",
+        "unidades": {
+            "932": "São João del Rei - MG"
+        }
     }
 }
