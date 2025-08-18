@@ -138,5 +138,19 @@
         "unidades": {
             "1559": "Foz do Iguaçu - PR"
         }
+    },
+    "gerenciabeltrao": {
+        "senha": "Amor@123",
+        "role": "user",
+        "unidades": {
+            "1611": "Francisco Beltrão - PR"
+        }
+    },
+    "gerenciamontenegro": {
+        "senha": "Amor@123",
+        "role": "user",
+        "unidades": {
+            "1991": "Montenegro - PR"
+        }
     }
 }
