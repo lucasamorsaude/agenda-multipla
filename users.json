@@ -5,11 +5,12 @@
         "unidades": {
             "932": "São João del Rei - MG",
             "704": "Colombo - PR",
-            "1991": "Montenegro - PR",
+            "1991": "Montenegro - RS",
             "1761": "Curitiba Pinheirinho - PR",
             "1545": "Araucária - PR",
             "1718": "Lajeado - PR",
-            "1611": "Francisco Beltrão - PR"
+            "1611": "Francisco Beltrão - PR",
+            "1559": "Foz do Iguaçu - PR"
         }
     },
     "Lucas Mendes": {
@@ -22,14 +23,8 @@
             "1761": "Curitiba Pinheirinho - PR",
             "1991": "Montenegro - PR",
             "704": "Colombo - PR",
-            "932": "São João del Rei - MG"
-        }
-    },
-    "Dayane": {
-        "senha": "Amor@100",
-        "role": "user",
-        "unidades": {
-            "932": "São João del Rei - MG"
+            "932": "São João del Rei - MG",
+            "1559": "Foz do Iguaçu - PR"
         }
     },
     "barbarab": {
@@ -65,6 +60,83 @@
         "role": "user",
         "unidades": {
             "932": "São João del Rei - MG"
+        }
+    },
+    "gerenciaaraucaria": {
+        "senha": "Amor@123",
+        "role": "user",
+        "unidades": {
+            "1545": "Araucária - PR"
+        }
+    },
+    "renata": {
+        "senha": "Amor@123",
+        "role": "user",
+        "unidades": {
+            "1545": "Araucária - PR"
+        }
+    },
+    "leticia": {
+        "senha": "Amor@123",
+        "role": "user",
+        "unidades": {
+            "1545": "Araucária - PR"
+        }
+    },
+    "gerenciacolombo": {
+        "senha": "Amor@123",
+        "role": "user",
+        "unidades": {
+            "704": "Colombo - PR"
+        }
+    },
+    "jessica": {
+        "senha": "Amor@123",
+        "role": "user",
+        "unidades": {
+            "704": "Colombo - PR"
+        }
+    },
+    "kaylaine": {
+        "senha": "Amor@123",
+        "role": "user",
+        "unidades": {
+            "704": "Colombo - PR"
+        }
+    },
+    "gerenciapinheirinho": {
+        "senha": "Amor@123",
+        "role": "user",
+        "unidades": {
+            "1761": "Curitiba Pinheirinho - PR"
+        }
+    },
+    "adriano": {
+        "senha": "Amor@123",
+        "role": "user",
+        "unidades": {
+            "1761": "Curitiba Pinheirinho - PR"
+        }
+    },
+    "amabile": {
+        "senha": "Amor@123",
+        "role": "user",
+        "unidades": {
+            "1761": "Curitiba Pinheirinho - PR"
+        }
+    },
+    "gerenciafoz": {
+        "senha": "Amor@123",
+        "role": "user",
+        "unidades": {
+            "1559": "Foz do Iguaçu - PR"
+        }
+    },
+    "nielton": {
+        "senha": "Amor@123",
+        "role": "user",
+        "unidades": {
+            "1559": "Foz do Iguaçu - PR"
         }
     }
 }
