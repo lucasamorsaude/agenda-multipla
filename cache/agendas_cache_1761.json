@@ -4750,17 +4750,17 @@
                         "specialtyId": 630,
                         "specialtyName": "Dermatologia",
                         "appointmentId": 19293608,
-                        "appointmentStatus": "Agendado",
+                        "appointmentStatus": "Marcado - confirmado",
                         "hasCanceledAppointments": false,
                         "patient": "TAMIRES SOARES E SOUSA",
                         "encaixe": false,
                         "patientId": 2379263,
-                        "statusId": 2,
+                        "statusId": 16,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 812714,
                         "interval": 10,
-                        "status": "Agendado",
+                        "status": "Marcado - confirmado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 3907,
@@ -7000,17 +7000,17 @@
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
                         "appointmentId": 19635506,
-                        "appointmentStatus": "Agendado",
+                        "appointmentStatus": "Marcado - confirmado",
                         "hasCanceledAppointments": false,
                         "patient": "EMIDIA DE SOUZA DA SILVA",
                         "encaixe": false,
                         "patientId": 24957615,
-                        "statusId": 2,
+                        "statusId": 16,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 834908,
                         "interval": 10,
-                        "status": "Agendado",
+                        "status": "Marcado - confirmado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 26992,
@@ -7050,17 +7050,17 @@
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
                         "appointmentId": 19602400,
-                        "appointmentStatus": "Agendado",
+                        "appointmentStatus": "Marcado - confirmado",
                         "hasCanceledAppointments": false,
                         "patient": "Osni Edinilson Mendes Ouriques",
                         "encaixe": false,
                         "patientId": 22351551,
-                        "statusId": 2,
+                        "statusId": 16,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 834908,
                         "interval": 10,
-                        "status": "Agendado",
+                        "status": "Marcado - confirmado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 26992,
@@ -7125,17 +7125,17 @@
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
                         "appointmentId": 19812180,
-                        "appointmentStatus": "Agendado",
+                        "appointmentStatus": "Marcado - confirmado",
                         "hasCanceledAppointments": false,
                         "patient": "CLAUDINEI FERREIRA LOPES",
                         "encaixe": false,
                         "patientId": 14122118,
-                        "statusId": 2,
+                        "statusId": 16,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 834908,
                         "interval": 10,
-                        "status": "Agendado",
+                        "status": "Marcado - confirmado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 26992,
@@ -8172,18 +8172,18 @@
                         "date": "22/08/2025",
                         "specialtyId": 678,
                         "specialtyName": "Psiquiatria",
-                        "appointmentId": 19732951,
-                        "appointmentStatus": "Agendado",
+                        "appointmentId": null,
+                        "appointmentStatus": null,
                         "hasCanceledAppointments": false,
-                        "patient": "Paula Caroline Kalinowski",
+                        "patient": null,
                         "encaixe": false,
-                        "patientId": 444997,
-                        "statusId": 2,
+                        "patientId": null,
+                        "statusId": null,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 811722,
                         "interval": 10,
-                        "status": "Agendado",
+                        "status": "Livre",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 29092,
@@ -9249,17 +9249,17 @@
                         "specialtyId": 614,
                         "specialtyName": "Angiologia",
                         "appointmentId": 19224944,
-                        "appointmentStatus": "Agendado",
+                        "appointmentStatus": "Marcado - confirmado",
                         "hasCanceledAppointments": false,
                         "patient": "CLOVIS RIBEIRO",
                         "encaixe": false,
                         "patientId": 12321035,
-                        "statusId": 2,
+                        "statusId": 16,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 905993,
                         "interval": 20,
-                        "status": "Agendado",
+                        "status": "Marcado - confirmado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 34354,
@@ -10367,8 +10367,8 @@
         },
         "resumo_geral": {
             "Camila": {
-                "Agendado": 5,
-                "Marcado - confirmado": 13,
+                "Agendado": 4,
+                "Marcado - confirmado": 14,
                 "Encaixe (Marcado - confirmado)": 2,
                 "Livre": 3
             },
@@ -10389,18 +10389,18 @@
                 "Agendado": 9
             },
             "Antonio": {
-                "Agendado": 27,
-                "Livre": 17,
-                "Marcado - confirmado": 4
+                "Agendado": 24,
+                "Marcado - confirmado": 7,
+                "Livre": 17
             },
             "Alber José": {
-                "Agendado": 33,
-                "Marcado - confirmado": 2,
-                "Livre": 4
+                "Agendado": 32,
+                "Livre": 5,
+                "Marcado - confirmado": 2
             },
             "Taís": {
-                "Agendado": 6,
-                "Marcado - confirmado": 5
+                "Agendado": 5,
+                "Marcado - confirmado": 6
             },
             "Marina Lumi": {
                 "Marcado - confirmado": 3,
@@ -10412,12 +10412,12 @@
             }
         },
         "summary_metrics": {
-            "total_agendado_geral": 178,
-            "total_confirmado_geral": 46,
-            "percentual_confirmacao": "25.84%",
-            "total_ocupados": 178,
+            "total_agendado_geral": 177,
+            "total_confirmado_geral": 51,
+            "percentual_confirmacao": "28.81%",
+            "total_ocupados": 177,
             "total_slots_disponiveis": 235,
-            "percentual_ocupacao": "75.74%"
+            "percentual_ocupacao": "75.32%"
         },
         "conversion_data_for_selected_day": {
             "conversion_rate": "0.00%",
@@ -10430,15 +10430,15 @@
             },
             {
                 "profissional": "Camila",
-                "taxa_confirmacao": "65.00%"
+                "taxa_confirmacao": "70.00%"
+            },
+            {
+                "profissional": "Taís",
+                "taxa_confirmacao": "54.55%"
             },
             {
                 "profissional": "Thiago Luiz",
                 "taxa_confirmacao": "50.00%"
-            },
-            {
-                "profissional": "Taís",
-                "taxa_confirmacao": "45.45%"
             },
             {
                 "profissional": "Marina Lumi",
@@ -10446,7 +10446,7 @@
             },
             {
                 "profissional": "Antonio",
-                "taxa_confirmacao": "12.90%"
+                "taxa_confirmacao": "22.58%"
             },
             {
                 "profissional": "Catherine",
@@ -10458,7 +10458,7 @@
             },
             {
                 "profissional": "Alber José",
-                "taxa_confirmacao": "5.71%"
+                "taxa_confirmacao": "5.88%"
             },
             {
                 "profissional": "Simone",
@@ -10492,7 +10492,7 @@
             },
             {
                 "profissional": "Alber José",
-                "taxa_ocupacao": "89.74%"
+                "taxa_ocupacao": "87.18%"
             },
             {
                 "profissional": "Camila",

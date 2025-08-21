@@ -12531,18 +12531,18 @@
                         "date": "22/08/2025",
                         "specialtyId": 630,
                         "specialtyName": "Dermatologia",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 19895264,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "GISELLY RAIANNE SAMPAIO LIMA",
                         "encaixe": false,
-                        "patientId": null,
-                        "statusId": null,
+                        "patientId": 17886199,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 806904,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 23656,
@@ -13497,18 +13497,18 @@
                         "date": "22/08/2025",
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 19895466,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "Maria Elisangela Santos",
                         "encaixe": false,
-                        "patientId": null,
-                        "statusId": null,
+                        "patientId": 22634779,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 806817,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 23863,
@@ -16358,6 +16358,31 @@
                         "overbookingSchedule": false
                     },
                     {
+                        "id": 31837642,
+                        "formatedHour": "11:45",
+                        "hour": 11.75,
+                        "date": "22/08/2025",
+                        "specialtyId": 664,
+                        "specialtyName": "Ortopedia e traumatologia",
+                        "appointmentId": 19899062,
+                        "appointmentStatus": "Agendado",
+                        "hasCanceledAppointments": false,
+                        "patient": "MARCOS ROBERTO ZINI",
+                        "encaixe": true,
+                        "patientId": 20304822,
+                        "statusId": 2,
+                        "isAssistedScheduling": false,
+                        "overbookingAppointment": false,
+                        "idSchedule": 797212,
+                        "interval": 10,
+                        "status": "Encaixe",
+                        "returnAvailable": false,
+                        "attendanceLocalId": 0,
+                        "idProfessional": 34559,
+                        "professionalName": "Luiz Tadeu de Moura Fachine",
+                        "overbookingSchedule": false
+                    },
+                    {
                         "id": 27258800,
                         "formatedHour": "11:50",
                         "hour": 11.83,
@@ -17263,14 +17288,13 @@
                 "Marcado - confirmado": 5
             },
             "Jose": {
-                "Agendado": 10,
+                "Agendado": 11,
                 "Marcado - confirmado": 19,
-                "Livre": 18
+                "Livre": 17
             },
             "Acucena": {
                 "Marcado - confirmado": 18,
-                "Agendado": 3,
-                "Livre": 1
+                "Agendado": 4
             },
             "Guilherme": {
                 "Marcado - confirmado": 10,
@@ -17301,7 +17325,7 @@
                 "Marcado - confirmado": 20,
                 "Encaixe (Marcado - confirmado)": 2,
                 "Agendado": 5,
-                "Encaixe (Agendado)": 3
+                "Encaixe (Agendado)": 4
             },
             "Luiz ": {
                 "Agendado": 3,
@@ -17319,25 +17343,228 @@
                 "Agendado": 1
             }
         },
-        "resumo_html": "",
-        "table_headers": [],
-        "table_index": [],
-        "table_body": [],
         "summary_metrics": {
-            "total_agendado_geral": 0,
-            "percentual_confirmacao": "0%",
-            "total_confirmado_geral": 0,
-            "percentual_ocupacao": "0%",
-            "total_ocupados": 0,
-            "total_slots_disponiveis": 0
+            "total_agendado_geral": 226,
+            "total_confirmado_geral": 161,
+            "percentual_confirmacao": "71.24%",
+            "total_ocupados": 226,
+            "total_slots_disponiveis": 335,
+            "percentual_ocupacao": "67.46%"
         },
-        "profissionais_stats_confirmacao": [],
-        "profissionais_stats_ocupacao": [],
-        "profissionais_stats_conversao": [],
         "conversion_data_for_selected_day": {
             "conversion_rate": "0.00%",
             "total_atendidos": 0
-        }
+        },
+        "profissionais_stats_confirmacao": [
+            {
+                "profissional": "Annielys",
+                "taxa_confirmacao": "83.33%"
+            },
+            {
+                "profissional": "Lisane",
+                "taxa_confirmacao": "83.33%"
+            },
+            {
+                "profissional": "Elisangela",
+                "taxa_confirmacao": "82.35%"
+            },
+            {
+                "profissional": "Acucena",
+                "taxa_confirmacao": "81.82%"
+            },
+            {
+                "profissional": "Thamires",
+                "taxa_confirmacao": "75.00%"
+            },
+            {
+                "profissional": "Marco Antônio",
+                "taxa_confirmacao": "72.73%"
+            },
+            {
+                "profissional": "Rodrigo Fernando ",
+                "taxa_confirmacao": "68.42%"
+            },
+            {
+                "profissional": "Guilherme",
+                "taxa_confirmacao": "66.67%"
+            },
+            {
+                "profissional": "Adriana ",
+                "taxa_confirmacao": "66.67%"
+            },
+            {
+                "profissional": "Luiz Tadeu",
+                "taxa_confirmacao": "64.52%"
+            },
+            {
+                "profissional": "Jose",
+                "taxa_confirmacao": "63.33%"
+            },
+            {
+                "profissional": "Felipe",
+                "taxa_confirmacao": "62.50%"
+            },
+            {
+                "profissional": "Maria Zenilda",
+                "taxa_confirmacao": "60.00%"
+            },
+            {
+                "profissional": "Eliza",
+                "taxa_confirmacao": "57.14%"
+            },
+            {
+                "profissional": "Lorena ",
+                "taxa_confirmacao": "56.25%"
+            },
+            {
+                "profissional": "Francisco",
+                "taxa_confirmacao": "33.33%"
+            },
+            {
+                "profissional": "Luiz ",
+                "taxa_confirmacao": "25.00%"
+            }
+        ],
+        "profissionais_stats_ocupacao": [
+            {
+                "profissional": "Annielys",
+                "taxa_ocupacao": "100.00%"
+            },
+            {
+                "profissional": "Acucena",
+                "taxa_ocupacao": "100.00%"
+            },
+            {
+                "profissional": "Guilherme",
+                "taxa_ocupacao": "100.00%"
+            },
+            {
+                "profissional": "Rodrigo Fernando ",
+                "taxa_ocupacao": "100.00%"
+            },
+            {
+                "profissional": "Marco Antônio",
+                "taxa_ocupacao": "100.00%"
+            },
+            {
+                "profissional": "Luiz Tadeu",
+                "taxa_ocupacao": "100.00%"
+            },
+            {
+                "profissional": "Lorena ",
+                "taxa_ocupacao": "100.00%"
+            },
+            {
+                "profissional": "Elisangela",
+                "taxa_ocupacao": "94.44%"
+            },
+            {
+                "profissional": "Eliza",
+                "taxa_ocupacao": "77.78%"
+            },
+            {
+                "profissional": "Lisane",
+                "taxa_ocupacao": "75.00%"
+            },
+            {
+                "profissional": "Felipe",
+                "taxa_ocupacao": "69.57%"
+            },
+            {
+                "profissional": "Jose",
+                "taxa_ocupacao": "63.83%"
+            },
+            {
+                "profissional": "Luiz ",
+                "taxa_ocupacao": "57.14%"
+            },
+            {
+                "profissional": "Maria Zenilda",
+                "taxa_ocupacao": "41.67%"
+            },
+            {
+                "profissional": "Adriana ",
+                "taxa_ocupacao": "30.00%"
+            },
+            {
+                "profissional": "Francisco",
+                "taxa_ocupacao": "13.64%"
+            },
+            {
+                "profissional": "Thamires",
+                "taxa_ocupacao": "9.76%"
+            }
+        ],
+        "profissionais_stats_conversao": [
+            {
+                "profissional": "Annielys",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Eliza",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Thamires",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Felipe",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Maria Zenilda",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Lisane",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Jose",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Acucena",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Guilherme",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Elisangela",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Francisco",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Rodrigo Fernando ",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Marco Antônio",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Luiz Tadeu",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Luiz ",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Lorena ",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Adriana ",
+                "taxa_conversao": "0.00%"
+            }
+        ]
     },
     "2025-08-23": {
         "agendas": {

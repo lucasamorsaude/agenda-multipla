@@ -22195,16 +22195,18 @@
                         "date": "22/08/2025",
                         "specialtyId": 664,
                         "specialtyName": "Ortopedia e traumatologia",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 19903197,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "Magda Cristina da silva",
                         "encaixe": false,
+                        "patientId": 23866207,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 848702,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 22957,
@@ -23015,8 +23017,8 @@
             },
             "João": {
                 "Marcado - confirmado": 5,
-                "Agendado": 5,
-                "Livre": 12
+                "Agendado": 6,
+                "Livre": 11
             },
             "Ludmila ": {
                 "Agendado": 9,
@@ -23024,25 +23026,84 @@
                 "Livre": 1
             }
         },
-        "resumo_html": "",
-        "table_headers": [],
-        "table_index": [],
-        "table_body": [],
         "summary_metrics": {
-            "total_agendado_geral": 0,
-            "percentual_confirmacao": "0%",
-            "total_confirmado_geral": 0,
-            "percentual_ocupacao": "0%",
-            "total_ocupados": 0,
-            "total_slots_disponiveis": 0
+            "total_agendado_geral": 82,
+            "total_confirmado_geral": 39,
+            "percentual_confirmacao": "47.56%",
+            "total_ocupados": 82,
+            "total_slots_disponiveis": 147,
+            "percentual_ocupacao": "55.78%"
         },
-        "profissionais_stats_confirmacao": [],
-        "profissionais_stats_ocupacao": [],
-        "profissionais_stats_conversao": [],
         "conversion_data_for_selected_day": {
             "conversion_rate": "0.00%",
             "total_atendidos": 0
-        }
+        },
+        "profissionais_stats_confirmacao": [
+            {
+                "profissional": "Yosvel",
+                "taxa_confirmacao": "52.94%"
+            },
+            {
+                "profissional": "Ana",
+                "taxa_confirmacao": "50.00%"
+            },
+            {
+                "profissional": "Flavio",
+                "taxa_confirmacao": "46.67%"
+            },
+            {
+                "profissional": "João",
+                "taxa_confirmacao": "45.45%"
+            },
+            {
+                "profissional": "Ludmila ",
+                "taxa_confirmacao": "43.75%"
+            }
+        ],
+        "profissionais_stats_ocupacao": [
+            {
+                "profissional": "Ludmila ",
+                "taxa_ocupacao": "94.12%"
+            },
+            {
+                "profissional": "Flavio",
+                "taxa_ocupacao": "83.33%"
+            },
+            {
+                "profissional": "Yosvel",
+                "taxa_ocupacao": "50.00%"
+            },
+            {
+                "profissional": "João",
+                "taxa_ocupacao": "50.00%"
+            },
+            {
+                "profissional": "Ana",
+                "taxa_ocupacao": "21.05%"
+            }
+        ],
+        "profissionais_stats_conversao": [
+            {
+                "profissional": "Ana",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Yosvel",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Flavio",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "João",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Ludmila ",
+                "taxa_conversao": "0.00%"
+            }
+        ]
     },
     "2025-08-23": {
         "agendas": {

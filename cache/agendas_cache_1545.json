@@ -4701,18 +4701,18 @@
                         "date": "22/08/2025",
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 19897638,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "RODRIGO MARCELO BOROWSKI",
                         "encaixe": false,
-                        "patientId": null,
-                        "statusId": null,
+                        "patientId": 20658191,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 834849,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 21396,
@@ -5837,8 +5837,8 @@
                 "Marcado - confirmado": 5
             },
             "Zaida": {
-                "Livre": 35,
-                "Agendado": 4,
+                "Livre": 34,
+                "Agendado": 5,
                 "Marcado - confirmado": 16
             },
             "Giovanno Henrique": {
@@ -5852,25 +5852,72 @@
                 "Agendado": 1
             }
         },
-        "resumo_html": "",
-        "table_headers": [],
-        "table_index": [],
-        "table_body": [],
         "summary_metrics": {
-            "total_agendado_geral": 0,
-            "percentual_confirmacao": "0%",
-            "total_confirmado_geral": 0,
-            "percentual_ocupacao": "0%",
-            "total_ocupados": 0,
-            "total_slots_disponiveis": 0
+            "total_agendado_geral": 37,
+            "total_confirmado_geral": 27,
+            "percentual_confirmacao": "72.97%",
+            "total_ocupados": 37,
+            "total_slots_disponiveis": 89,
+            "percentual_ocupacao": "41.57%"
         },
-        "profissionais_stats_confirmacao": [],
-        "profissionais_stats_ocupacao": [],
-        "profissionais_stats_conversao": [],
         "conversion_data_for_selected_day": {
             "conversion_rate": "0.00%",
             "total_atendidos": 0
-        }
+        },
+        "profissionais_stats_confirmacao": [
+            {
+                "profissional": "Zaida",
+                "taxa_confirmacao": "76.19%"
+            },
+            {
+                "profissional": "Giovanno Henrique",
+                "taxa_confirmacao": "75.00%"
+            },
+            {
+                "profissional": "Emelly",
+                "taxa_confirmacao": "75.00%"
+            },
+            {
+                "profissional": "Renan",
+                "taxa_confirmacao": "62.50%"
+            }
+        ],
+        "profissionais_stats_ocupacao": [
+            {
+                "profissional": "Emelly",
+                "taxa_ocupacao": "66.67%"
+            },
+            {
+                "profissional": "Renan",
+                "taxa_ocupacao": "50.00%"
+            },
+            {
+                "profissional": "Zaida",
+                "taxa_ocupacao": "38.18%"
+            },
+            {
+                "profissional": "Giovanno Henrique",
+                "taxa_ocupacao": "33.33%"
+            }
+        ],
+        "profissionais_stats_conversao": [
+            {
+                "profissional": "Renan",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Zaida",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Giovanno Henrique",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Emelly",
+                "taxa_conversao": "0.00%"
+            }
+        ]
     },
     "2025-08-23": {
         "agendas": {

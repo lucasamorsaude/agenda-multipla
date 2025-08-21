@@ -5799,25 +5799,96 @@
                 "Livre": 13
             }
         },
-        "resumo_html": "",
-        "table_headers": [],
-        "table_index": [],
-        "table_body": [],
         "summary_metrics": {
-            "total_agendado_geral": 0,
-            "percentual_confirmacao": "0%",
-            "total_confirmado_geral": 0,
-            "percentual_ocupacao": "0%",
-            "total_ocupados": 0,
-            "total_slots_disponiveis": 0
+            "total_agendado_geral": 33,
+            "total_confirmado_geral": 19,
+            "percentual_confirmacao": "57.58%",
+            "total_ocupados": 33,
+            "total_slots_disponiveis": 157,
+            "percentual_ocupacao": "21.02%"
         },
-        "profissionais_stats_confirmacao": [],
-        "profissionais_stats_ocupacao": [],
-        "profissionais_stats_conversao": [],
         "conversion_data_for_selected_day": {
             "conversion_rate": "0.00%",
             "total_atendidos": 0
-        }
+        },
+        "profissionais_stats_confirmacao": [
+            {
+                "profissional": "Steffany ",
+                "taxa_confirmacao": "100.00%"
+            },
+            {
+                "profissional": "Keli",
+                "taxa_confirmacao": "69.23%"
+            },
+            {
+                "profissional": "Vinicius",
+                "taxa_confirmacao": "66.67%"
+            },
+            {
+                "profissional": "Samira Maira",
+                "taxa_confirmacao": "57.14%"
+            },
+            {
+                "profissional": "Gabriel",
+                "taxa_confirmacao": "50.00%"
+            },
+            {
+                "profissional": "Juliana",
+                "taxa_confirmacao": "0.00%"
+            }
+        ],
+        "profissionais_stats_ocupacao": [
+            {
+                "profissional": "Keli",
+                "taxa_ocupacao": "100.00%"
+            },
+            {
+                "profissional": "Vinicius",
+                "taxa_ocupacao": "37.50%"
+            },
+            {
+                "profissional": "Samira Maira",
+                "taxa_ocupacao": "35.00%"
+            },
+            {
+                "profissional": "Juliana",
+                "taxa_ocupacao": "15.38%"
+            },
+            {
+                "profissional": "Gabriel",
+                "taxa_ocupacao": "12.50%"
+            },
+            {
+                "profissional": "Steffany ",
+                "taxa_ocupacao": "1.52%"
+            }
+        ],
+        "profissionais_stats_conversao": [
+            {
+                "profissional": "Juliana",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Keli",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Vinicius",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Gabriel",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Samira Maira",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Steffany ",
+                "taxa_conversao": "0.00%"
+            }
+        ]
     },
     "2025-08-23": {
         "agendas": {

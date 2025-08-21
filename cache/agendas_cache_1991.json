@@ -1813,17 +1813,17 @@
                         "specialtyId": 638,
                         "specialtyName": "Ginecologia e obstetrícia",
                         "appointmentId": 19346132,
-                        "appointmentStatus": "Agendado",
+                        "appointmentStatus": "Marcado - confirmado",
                         "hasCanceledAppointments": false,
                         "patient": "GABRIELE MENDONCA IBARRA",
                         "encaixe": false,
                         "patientId": 22695260,
-                        "statusId": 2,
+                        "statusId": 16,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 900082,
                         "interval": 10,
-                        "status": "Agendado",
+                        "status": "Marcado - confirmado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 22633,
@@ -1838,17 +1838,17 @@
                         "specialtyId": 752,
                         "specialtyName": "Ginecologia",
                         "appointmentId": 19346132,
-                        "appointmentStatus": "Agendado",
+                        "appointmentStatus": "Marcado - confirmado",
                         "hasCanceledAppointments": false,
                         "patient": "GABRIELE MENDONCA IBARRA",
                         "encaixe": false,
                         "patientId": 22695260,
-                        "statusId": 2,
+                        "statusId": 16,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 900082,
                         "interval": 10,
-                        "status": "Agendado",
+                        "status": "Marcado - confirmado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 22633,
@@ -2956,6 +2956,31 @@
                         "overbookingSchedule": false
                     },
                     {
+                        "id": 31846892,
+                        "formatedHour": "10:35",
+                        "hour": 10.58,
+                        "date": "22/08/2025",
+                        "specialtyId": 752,
+                        "specialtyName": "Ginecologia",
+                        "appointmentId": 19903273,
+                        "appointmentStatus": "Agendado",
+                        "hasCanceledAppointments": false,
+                        "patient": "INES CRISTINA ARGEMI",
+                        "encaixe": true,
+                        "patientId": 10545294,
+                        "statusId": 2,
+                        "isAssistedScheduling": false,
+                        "overbookingAppointment": false,
+                        "idSchedule": 900082,
+                        "interval": 10,
+                        "status": "Encaixe",
+                        "returnAvailable": false,
+                        "attendanceLocalId": 0,
+                        "idProfessional": 22633,
+                        "professionalName": "Laetitia Moraes Trindade",
+                        "overbookingSchedule": false
+                    },
+                    {
                         "id": 30427077,
                         "formatedHour": "10:40",
                         "hour": 10.67,
@@ -3063,12 +3088,12 @@
                         "specialtyId": 752,
                         "specialtyName": "Ginecologia",
                         "appointmentId": 19668529,
-                        "appointmentStatus": "Agendado",
+                        "appointmentStatus": "Marcado - confirmado",
                         "hasCanceledAppointments": false,
                         "patient": "Maria Simão da Silva",
                         "encaixe": true,
                         "patientId": 23912162,
-                        "statusId": 2,
+                        "statusId": 16,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 900082,
@@ -4797,9 +4822,9 @@
         },
         "resumo_geral": {
             "Laetitia": {
-                "Marcado - confirmado": 34,
-                "Agendado": 26,
-                "Encaixe (Marcado - confirmado)": 5,
+                "Marcado - confirmado": 36,
+                "Agendado": 24,
+                "Encaixe (Marcado - confirmado)": 6,
                 "Encaixe (Agendado)": 4
             },
             "Gustavo": {
@@ -4818,25 +4843,72 @@
                 "Marcado - confirmado": 1
             }
         },
-        "resumo_html": "",
-        "table_headers": [],
-        "table_index": [],
-        "table_body": [],
         "summary_metrics": {
-            "total_agendado_geral": 0,
-            "percentual_confirmacao": "0%",
-            "total_confirmado_geral": 0,
-            "percentual_ocupacao": "0%",
-            "total_ocupados": 0,
-            "total_slots_disponiveis": 0
+            "total_agendado_geral": 85,
+            "total_confirmado_geral": 46,
+            "percentual_confirmacao": "54.12%",
+            "total_ocupados": 85,
+            "total_slots_disponiveis": 127,
+            "percentual_ocupacao": "66.93%"
         },
-        "profissionais_stats_confirmacao": [],
-        "profissionais_stats_ocupacao": [],
-        "profissionais_stats_conversao": [],
         "conversion_data_for_selected_day": {
             "conversion_rate": "0.00%",
             "total_atendidos": 0
-        }
+        },
+        "profissionais_stats_confirmacao": [
+            {
+                "profissional": "Laetitia",
+                "taxa_confirmacao": "51.43%"
+            },
+            {
+                "profissional": "Ana Cristina",
+                "taxa_confirmacao": "50.00%"
+            },
+            {
+                "profissional": "Gustavo",
+                "taxa_confirmacao": "25.00%"
+            },
+            {
+                "profissional": "Isaura Lisiane",
+                "taxa_confirmacao": "22.22%"
+            }
+        ],
+        "profissionais_stats_ocupacao": [
+            {
+                "profissional": "Laetitia",
+                "taxa_ocupacao": "100.00%"
+            },
+            {
+                "profissional": "Isaura Lisiane",
+                "taxa_ocupacao": "90.00%"
+            },
+            {
+                "profissional": "Ana Cristina",
+                "taxa_ocupacao": "18.18%"
+            },
+            {
+                "profissional": "Gustavo",
+                "taxa_ocupacao": "11.11%"
+            }
+        ],
+        "profissionais_stats_conversao": [
+            {
+                "profissional": "Laetitia",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Gustavo",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Isaura Lisiane",
+                "taxa_conversao": "0.00%"
+            },
+            {
+                "profissional": "Ana Cristina",
+                "taxa_conversao": "0.00%"
+            }
+        ]
     },
     "2025-08-23": {
         "agendas": {
