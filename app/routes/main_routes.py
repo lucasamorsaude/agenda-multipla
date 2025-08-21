@@ -58,12 +58,7 @@ def index():
     if 'selected_unit_id' not in session: return redirect(url_for('auth.select_unit'))
     
     id_unidade_selecionada = session['selected_unit_id']
-    auth = get_auth_new(id_unidade_selecionada)
-    if not auth:
-        flash('Falha ao obter token de autenticação.', 'danger')
-        return redirect(url_for('auth.logout'))
     
-    HEADERS = {'Authorization': f"Bearer {auth}", 'Cookie': current_app.config['COOKIE_VALUE']}
 
     selected_date = date.fromisoformat(request.form['selected_date']) if request.method == 'POST' else date.today()
     selected_date_str = selected_date.strftime('%Y-%m-%d')
@@ -75,6 +70,13 @@ def index():
         print(f"SUCESSO: Usando dados do cache para {selected_date_str}.")
         context.update(cached_data)
     else:
+        auth = get_auth_new(id_unidade_selecionada)
+        if not auth:
+            flash('Falha ao obter token de autenticação.', 'danger')
+            return redirect(url_for('auth.logout'))
+        
+        HEADERS = {'Authorization': f"Bearer {auth}", 'Cookie': current_app.config['COOKIE_VALUE']}
+
         print(f"AVISO: Cache não encontrado ou inválido para {selected_date_str}. Buscando da API.")
         all_profissionais = get_all_professionals(HEADERS)
         if all_profissionais:

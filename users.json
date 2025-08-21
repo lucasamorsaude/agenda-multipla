@@ -19,7 +19,7 @@
             "1545": "Araucária - PR",
             "1611": "Francisco Beltrão - PR",
             "1761": "Curitiba Pinheirinho - PR",
-            "1991": "Montenegro - PR",
+            "1991": "Montenegro - RS",
             "704": "Colombo - PR",
             "932": "São João del Rei - MG",
             "1559": "Foz do Iguaçu - PR"
@@ -156,7 +156,7 @@
         "senha": "Amor@123",
         "role": "user",
         "unidades": {
-            "1991": "Montenegro - PR"
+            "1991": "Montenegro - RS"
         }
     },
     "biancaf": {
