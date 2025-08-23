@@ -1,7 +1,7 @@
 # app/routes/main_routes.py
 
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash, current_app
-from datetime import date
+from datetime import date, datetime
 import pandas as pd
 from login_auth import get_auth_new
 from cache_manager import load_agendas_from_cache, save_agendas_to_cache
@@ -60,8 +60,9 @@ def index():
     id_unidade_selecionada = session['selected_unit_id']
     
 
-    selected_date = date.fromisoformat(request.form['selected_date']) if request.method == 'POST' else date.today()
-    selected_date_str = selected_date.strftime('%Y-%m-%d')
+    selected_date_str = request.values.get('selected_date', date.today().strftime('%Y-%m-%d'))
+    selected_date = date.fromisoformat(selected_date_str)    
+
     
     context = _get_default_context()
     cached_data = load_agendas_from_cache(selected_date, id_unidade_selecionada)
@@ -69,6 +70,14 @@ def index():
     if cached_data and cached_data.get('agendas'):
         print(f"SUCESSO: Usando dados do cache para {selected_date_str}.")
         context.update(cached_data)
+
+        if context.get('last_updated_iso'):
+            try:
+                dt_object = datetime.fromisoformat(context['last_updated_iso'])
+                context['last_updated_formatted'] = dt_object.strftime('%H:%M - %d/%m/%Y')
+            except (ValueError, TypeError):
+                context['last_updated_formatted'] = None
+
     else:
         auth = get_auth_new(id_unidade_selecionada)
         if not auth:
@@ -116,6 +125,11 @@ def index():
                     context["resumo_geral"][prof_nome] = contagem_status
                     
             if context.get("agendas"):
+
+                now = datetime.now()
+                context['last_updated_iso'] = now.isoformat() # Formato para o computador
+                context['last_updated_formatted'] = now.strftime('%H:%M - %d/%m/%Y') # Formato para exibição
+                
                 save_agendas_to_cache(context, selected_date, id_unidade_selecionada)
         else:
             print("ERRO: A chamada get_all_professionals não retornou dados.")
@@ -155,3 +169,40 @@ def index():
     context["profissionais_stats_conversao"] = _prepare_ranking_data(context.get("profissionais_stats_conversao", []), 'taxa_conversao')
 
     return render_template('index.html', selected_date=selected_date_str, status_styles=STATUS_STYLES, agenda_url_template=AGENDA_URL_TEMPLATE, **context)
+
+
+@main_bp.route('/switch_unit/<direction>')
+def switch_unit(direction):
+    """
+    Muda a unidade selecionada na sessão para a próxima ou anterior
+    e redireciona para a página inicial, mantendo a data selecionada.
+    """
+    if 'username' not in session or not session.get('unidades'):
+        return redirect(url_for('auth.login'))
+
+    # Pega a data que foi enviada como parâmetro no link
+    selected_date = request.args.get('selected_date', date.today().strftime('%Y-%m-%d'))
+
+    sorted_unidades_items = sorted(session['unidades'].items(), key=lambda item: item[1])
+    unidades_ids = [item[0] for item in sorted_unidades_items]
+
+    if len(unidades_ids) <= 1:
+        return redirect(url_for('main.index', selected_date=selected_date))
+
+    try:
+        current_unit_id = session.get('selected_unit_id')
+        current_index = unidades_ids.index(current_unit_id)
+
+        if direction == 'next':
+            new_index = (current_index + 1) % len(unidades_ids)
+        elif direction == 'prev':
+            new_index = (current_index - 1 + len(unidades_ids)) % len(unidades_ids)
+        else:
+            return redirect(url_for('main.index', selected_date=selected_date))
+
+        session['selected_unit_id'] = unidades_ids[new_index]
+
+    except (ValueError, KeyError):
+        session['selected_unit_id'] = unidades_ids[0]
+
+    return redirect(url_for('main.index', selected_date=selected_date))

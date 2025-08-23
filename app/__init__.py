@@ -29,13 +29,13 @@ def create_app():
     from .routes.main_routes import main_bp
     from .routes.api_routes import api_bp
     from .routes.cache_routes import cache_bp
-    from .routes.admin_routes import admin_bp
+    from app.routes.user_routes import user_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(cache_bp)
-    app.register_blueprint(admin_bp)
+    app.register_blueprint(user_bp)
 
     # Adiciona uma rota raiz para redirecionar para o login
     @app.route('/')

@@ -20,12 +20,18 @@ def login():
 
         if user_data and user_data['senha'] == password:
             session['username'] = username
-            session['unidades'] = user_data['unidades']
+
+            # Pega as unidades e ordena pelo nome (o valor do dicionário)
+            unidades = user_data.get('unidades', {})
+            sorted_unidades = dict(sorted(unidades.items(), key=lambda item: item[1]))
+            session['unidades'] = sorted_unidades
+
             # --- Adiciona a 'role' na sessão ---
             session['role'] = user_data.get('role', 'user') # 'user' é o padrão
 
-            if len(user_data['unidades']) == 1:
-                unidade_id = list(user_data['unidades'].keys())[0]
+            # Agora o len() deve usar o dicionário já ordenado
+            if len(session['unidades']) == 1:
+                unidade_id = list(session['unidades'].keys())[0]
                 session['selected_unit_id'] = unidade_id
                 flash('Login bem-sucedido!', 'success')
                 return redirect(url_for('main.index'))

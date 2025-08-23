@@ -17,7 +17,8 @@
         <h3 class="card-title text-center mb-4">Olá, {{ session['username'] }}!</h3>
         <p class="text-center">Selecione a unidade que deseja visualizar:</p>
         <div class="d-grid gap-2">
-            {% for unit_id, unit_name in session['unidades'].items() %}
+            {% for unit_id, unit_name in session['unidades'].items()|sort(attribute=1) %}
+    
                 <a href="{{ url_for('auth.set_unit', unit_id=unit_id) }}" class="btn btn-outline-primary btn-lg unit-button">
                     {{ unit_name }}
                 </a>

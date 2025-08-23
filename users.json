@@ -1,7 +1,7 @@
 {
     "DOP": {
         "senha": "Amor@200",
-        "role": "admin",
+        "role": "superadmin",
         "unidades": {
             "932": "São João del Rei - MG",
             "704": "Colombo - PR",
@@ -14,7 +14,7 @@
     },
     "Lucas Mendes": {
         "senha": "Amor@100",
-        "role": "admin",
+        "role": "superadmin",
         "unidades": {
             "1545": "Araucária - PR",
             "1611": "Francisco Beltrão - PR",
@@ -27,7 +27,7 @@
     },
     "gabrielpires": {
         "senha": "Amor@200",
-        "role": "user",
+        "role": "admin",
         "unidades": {
             "1545": "Araucária - PR",
             "932": "São João del Rei - MG"
@@ -70,7 +70,7 @@
     },
     "gerenciaaraucaria": {
         "senha": "Amor@123",
-        "role": "user",
+        "role": "admin",
         "unidades": {
             "1545": "Araucária - PR"
         }
@@ -91,7 +91,7 @@
     },
     "gerenciacolombo": {
         "senha": "Amor@123",
-        "role": "user",
+        "role": "admin",
         "unidades": {
             "704": "Colombo - PR"
         }
@@ -112,7 +112,7 @@
     },
     "gerenciapinheirinho": {
         "senha": "Amor@123",
-        "role": "user",
+        "role": "admin",
         "unidades": {
             "1761": "Curitiba Pinheirinho - PR"
         }
@@ -133,7 +133,7 @@
     },
     "gerenciafoz": {
         "senha": "Amor@123",
-        "role": "user",
+        "role": "admin",
         "unidades": {
             "1559": "Foz do Iguaçu - PR"
         }
@@ -147,14 +147,14 @@
     },
     "gerenciabeltrao": {
         "senha": "Amor@123",
-        "role": "user",
+        "role": "admin",
         "unidades": {
             "1611": "Francisco Beltrão - PR"
         }
     },
     "gerenciamontenegro": {
         "senha": "Amor@123",
-        "role": "user",
+        "role": "admin",
         "unidades": {
             "1991": "Montenegro - RS"
         }
@@ -168,7 +168,7 @@
     },
     "virginiar": {
         "senha": "Amor@123",
-        "role": "user",
+        "role": "admin",
         "unidades": {
             "932": "São João del Rei - MG"
         }
