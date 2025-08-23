@@ -47,6 +47,9 @@
                 </div>
             </div>
             <div>
+                {% if session.role == 'superadmin' %}
+                    <a href="{{ url_for('superadmin.dashboard') }}" class="btn btn-danger">Dashboard Superadmin</a>
+                {% endif %}
                 <a href="{{ url_for('user.user_panel') }}" class="btn btn-info">Usuários</a>
                 <a href="{{ url_for('auth.logout') }}" class="btn btn-danger ms-2">Sair</a>
             </div>
