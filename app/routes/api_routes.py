@@ -34,3 +34,16 @@ def appointment_details_api(appointment_id):
     
     if details: return jsonify(details)
     else: return jsonify({"error": "Agendamento não encontrado"}), 404
+
+@api_bp.route('/api/my_units')
+def my_units_api():
+    if 'unidades' not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    # Retorna as unidades do usuário já em ordem alfabética pelo nome
+    sorted_unidades = sorted(session['unidades'].items(), key=lambda item: item[1])
+    
+    # Formata como uma lista de objetos para o JavaScript
+    units_list = [{"id": unit_id, "name": unit_name} for unit_id, unit_name in sorted_unidades]
+    
+    return jsonify(units_list)

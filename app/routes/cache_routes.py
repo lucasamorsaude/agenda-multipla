@@ -1,9 +1,6 @@
 # app/routes/cache_routes.py
-from flask import Blueprint, request, jsonify, session, current_app
-from datetime import date
-from threading import Thread
-
-# Importe a função que faz o trabalho pesado. Assumindo que está em update_cache_script.py
+from flask import Blueprint, request, jsonify, session
+from datetime import date, datetime
 from update_cache_script import process_and_cache_day 
 
 cache_bp = Blueprint('cache', __name__)
@@ -11,29 +8,33 @@ cache_bp = Blueprint('cache', __name__)
 # ROTA CORRIGIDA: SEM THREAD, EXECUÇÃO SÍNCRONA
 @cache_bp.route('/force_update_day_cache', methods=['POST'])
 def force_update_day_cache_sync():
-    if 'selected_unit_id' not in session:
-        return jsonify({"status": "error", "message": "Usuário não autenticado"}), 401
+    # Pega o ID da unidade do formulário enviado pelo JavaScript
+    id_unidade = request.form.get('unit_id')
+    if not id_unidade:
+        return jsonify({"status": "error", "message": "ID da unidade não fornecido."}), 400
+
+    # Verifica se o usuário tem permissão para esta unidade
+    if 'unidades' not in session or id_unidade not in session['unidades']:
+        return jsonify({"status": "error", "message": "Acesso não autorizado para esta unidade."}), 403
         
-    id_unidade_selecionada = session['selected_unit_id']
     selected_date_str = request.form.get('selected_date_force_update', date.today().strftime('%Y-%m-%d'))
     selected_date = date.fromisoformat(selected_date_str)
+    unit_name = session['unidades'].get(id_unidade, f"ID {id_unidade}")
 
     try:
-        print(f"Iniciando atualização SÍNCRONA para o dia {selected_date} na unidade {id_unidade_selecionada}.")
+        print(f"Iniciando atualização para o dia {selected_date} na unidade {unit_name} (ID: {id_unidade}).")
         
-        # Chama a função diretamente, sem thread. O código vai esperar aqui.
-        process_and_cache_day(selected_date, id_unidade_selecionada)
+        process_and_cache_day(selected_date, id_unidade)
         
-        print(f"Atualização SÍNCRONA para o dia {selected_date} finalizada.")
+        print(f"Atualização para o dia {selected_date} na unidade {unit_name} finalizada.")
         
-        # Responde SÓ DEPOIS que tudo terminou.
         return jsonify({
             "status": "success", 
-            "message": f"Cache para o dia {selected_date.strftime('%d/%m/%Y')} atualizado com sucesso!"
+            "message": f"Cache para a unidade {unit_name} atualizado!"
         })
     except Exception as e:
-        print(f"Erro durante a atualização síncrona do cache: {e}")
+        print(f"Erro durante a atualização do cache para {unit_name}: {e}")
         return jsonify({
             "status": "error",
-            "message": "Ocorreu um erro ao atualizar o cache."
+            "message": f"Erro ao atualizar o cache da unidade {unit_name}."
         }), 500

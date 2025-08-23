@@ -1,6 +1,6 @@
 import sys
 import os
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import json
 import requests
 import pandas as pd
@@ -132,6 +132,10 @@ def process_and_cache_day(target_date: date, clinic_id: int):
         # DEBUG: Imprime as métricas calculadas antes de salvar
         total_atendidos_debug = context.get("conversion_data_for_selected_day", {}).get("total_atendidos", "N/A")
         print(f"DEBUG [CACHE SCRIPT]: Métricas calculadas. Total de atendidos: {total_atendidos_debug}")
+
+    now = datetime.now()
+    context['last_updated_iso'] = now.isoformat()
+    context['last_updated_formatted'] = now.strftime('%H:%M - %d/%m/%Y')
 
     # Salva o dicionário 'context' completo no cache
     save_agendas_to_cache(context, target_date, clinic_id)
