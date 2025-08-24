@@ -5028,18 +5028,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 629,
                         "specialtyName": "Coloproctologia",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20149718,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "LUCAS PITAGORAS DAS NEVES",
                         "encaixe": false,
-                        "patientId": null,
-                        "statusId": null,
+                        "patientId": 25067831,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 846660,
                         "interval": 15,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 7499,
@@ -5053,18 +5053,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 634,
                         "specialtyName": "Gastroenterologia",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20149718,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "LUCAS PITAGORAS DAS NEVES",
                         "encaixe": false,
-                        "patientId": null,
-                        "statusId": null,
+                        "patientId": 25067831,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 846660,
                         "interval": 15,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 7499,
@@ -6230,16 +6230,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20157453,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "SILVANA SCARDANZAN MACHADO",
                         "encaixe": false,
+                        "patientId": 12712768,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 855329,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 13568,
@@ -6744,16 +6746,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20157438,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "Maisa Ocraska Opalinsk",
                         "encaixe": false,
+                        "patientId": 22050264,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 855329,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 13568,
@@ -6838,16 +6842,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20157999,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "KAUANNE RAFAELLY DE SIQUEIRA HUBERT",
                         "encaixe": false,
+                        "patientId": 8931143,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 855329,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 13568,
@@ -8783,13 +8789,13 @@
         },
         "resumo_geral": {
             "Jesus": {
-                "Agendado": 16,
+                "Agendado": 18,
                 "Marcado - confirmado": 12,
-                "Livre": 4
+                "Livre": 2
             },
             "Isabela": {
-                "Agendado": 12,
-                "Livre": 37,
+                "Agendado": 15,
+                "Livre": 34,
                 "Marcado - confirmado": 4
             },
             "Julliane": {
@@ -8813,12 +8819,12 @@
             }
         },
         "summary_metrics": {
-            "total_agendado_geral": 98,
+            "total_agendado_geral": 103,
             "total_confirmado_geral": 32,
-            "percentual_confirmacao": "32.65%",
-            "total_ocupados": 98,
+            "percentual_confirmacao": "31.07%",
+            "total_ocupados": 103,
             "total_slots_disponiveis": 162,
-            "percentual_ocupacao": "60.49%"
+            "percentual_ocupacao": "63.58%"
         },
         "conversion_data_for_selected_day": {
             "conversion_rate": "0.00%",
@@ -8831,7 +8837,7 @@
             },
             {
                 "profissional": "Jesus",
-                "taxa_confirmacao": "42.86%"
+                "taxa_confirmacao": "40.00%"
             },
             {
                 "profissional": "Andre",
@@ -8839,7 +8845,7 @@
             },
             {
                 "profissional": "Isabela",
-                "taxa_confirmacao": "25.00%"
+                "taxa_confirmacao": "21.05%"
             },
             {
                 "profissional": "Julliane",
@@ -8861,7 +8867,7 @@
             },
             {
                 "profissional": "Jesus",
-                "taxa_ocupacao": "87.50%"
+                "taxa_ocupacao": "93.75%"
             },
             {
                 "profissional": "Thiago Luiz",
@@ -8869,7 +8875,7 @@
             },
             {
                 "profissional": "Isabela",
-                "taxa_ocupacao": "30.19%"
+                "taxa_ocupacao": "35.85%"
             },
             {
                 "profissional": "Alcione",
@@ -8902,8 +8908,8 @@
                 "taxa_conversao": "0.00%"
             }
         ],
-        "last_updated_iso": "2025-08-23T17:53:55.286396",
-        "last_updated_formatted": "17:53 - 23/08/2025"
+        "last_updated_iso": "2025-08-24T14:24:25.125069",
+        "last_updated_formatted": "14:24 - 24/08/2025"
     },
     "2025-08-23": {
         "agendas": {

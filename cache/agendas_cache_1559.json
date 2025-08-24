@@ -9191,18 +9191,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
-                        "appointmentId": 20053607,
-                        "appointmentStatus": "Agendado",
+                        "appointmentId": null,
+                        "appointmentStatus": null,
                         "hasCanceledAppointments": false,
-                        "patient": "Gabriel Bento Antoniolli",
+                        "patient": null,
                         "encaixe": false,
-                        "patientId": 25057869,
-                        "statusId": 2,
+                        "patientId": null,
+                        "statusId": null,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 792005,
                         "interval": 10,
-                        "status": "Agendado",
+                        "status": "Livre",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 18199,
@@ -9241,16 +9241,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20155729,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "MURILO HENRIQUE ORTEGA JIMENEZ",
                         "encaixe": false,
+                        "patientId": 3231352,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 792005,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 18199,
@@ -9587,17 +9589,17 @@
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
                         "appointmentId": 20025043,
-                        "appointmentStatus": "Agendado",
+                        "appointmentStatus": "Marcado - confirmado",
                         "hasCanceledAppointments": false,
                         "patient": "Francisca Maria de Souza",
                         "encaixe": false,
                         "patientId": 24927032,
-                        "statusId": 2,
+                        "statusId": 16,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 797161,
                         "interval": 15,
-                        "status": "Agendado",
+                        "status": "Marcado - confirmado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 23085,
@@ -9612,17 +9614,17 @@
                         "specialtyId": 646,
                         "specialtyName": "Medicina de família e comunidade",
                         "appointmentId": 20025043,
-                        "appointmentStatus": "Agendado",
+                        "appointmentStatus": "Marcado - confirmado",
                         "hasCanceledAppointments": false,
                         "patient": "Francisca Maria de Souza",
                         "encaixe": false,
                         "patientId": 24927032,
-                        "statusId": 2,
+                        "statusId": 16,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 797161,
                         "interval": 15,
-                        "status": "Agendado",
+                        "status": "Marcado - confirmado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 23085,
@@ -11355,18 +11357,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20155998,
+                        "appointmentStatus": "Marcado - confirmado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "KESIA FERREIRA FIGUEIREDO DE SOUZA VIEIRA",
                         "encaixe": false,
-                        "patientId": null,
-                        "statusId": null,
+                        "patientId": 23948796,
+                        "statusId": 16,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 904940,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Marcado - confirmado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 28810,
@@ -13106,12 +13108,12 @@
                         "date": "25/08/2025",
                         "specialtyId": 752,
                         "specialtyName": "Ginecologia",
-                        "appointmentId": 17469600,
+                        "appointmentId": 20155273,
                         "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": "KAMILLY VITORIA ROCHA GONZALES",
+                        "patient": "NATASHA SILVA OLIVEIRA",
                         "encaixe": false,
-                        "patientId": 11083886,
+                        "patientId": 8189629,
                         "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
@@ -13477,16 +13479,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20155952,
+                        "appointmentStatus": "Marcado - confirmado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "ROSELI CRISTINA DE PAIVA",
                         "encaixe": false,
+                        "patientId": 3201574,
+                        "statusId": 16,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 831649,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Marcado - confirmado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 38374,
@@ -13995,8 +13999,8 @@
                 "Livre": 7
             },
             "Cristian": {
-                "Marcado - confirmado": 16,
-                "Agendado": 8,
+                "Marcado - confirmado": 18,
+                "Agendado": 6,
                 "Livre": 10
             },
             "Acucena": {
@@ -14012,8 +14016,8 @@
                 "Marcado - confirmado": 7
             },
             "Francisco": {
-                "Marcado - confirmado": 9,
-                "Livre": 43
+                "Marcado - confirmado": 10,
+                "Livre": 42
             },
             "Marco Antônio": {
                 "Agendado": 3,
@@ -14031,17 +14035,17 @@
                 "Agendado": 1
             },
             "Mohamad ": {
-                "Marcado - confirmado": 1,
-                "Livre": 23
+                "Marcado - confirmado": 2,
+                "Livre": 22
             }
         },
         "summary_metrics": {
-            "total_agendado_geral": 137,
-            "total_confirmado_geral": 108,
-            "percentual_confirmacao": "78.83%",
-            "total_ocupados": 137,
+            "total_agendado_geral": 139,
+            "total_confirmado_geral": 112,
+            "percentual_confirmacao": "80.58%",
+            "total_ocupados": 139,
             "total_slots_disponiveis": 271,
-            "percentual_ocupacao": "50.55%"
+            "percentual_ocupacao": "51.29%"
         },
         "conversion_data_for_selected_day": {
             "conversion_rate": "0.00%",
@@ -14077,16 +14081,16 @@
                 "taxa_confirmacao": "81.25%"
             },
             {
+                "profissional": "Cristian",
+                "taxa_confirmacao": "75.00%"
+            },
+            {
                 "profissional": "Marco Antônio",
                 "taxa_confirmacao": "72.73%"
             },
             {
                 "profissional": "Acucena",
                 "taxa_confirmacao": "71.43%"
-            },
-            {
-                "profissional": "Cristian",
-                "taxa_confirmacao": "66.67%"
             },
             {
                 "profissional": "Lorena ",
@@ -14136,15 +14140,15 @@
             },
             {
                 "profissional": "Francisco",
-                "taxa_ocupacao": "17.31%"
+                "taxa_ocupacao": "19.23%"
+            },
+            {
+                "profissional": "Mohamad ",
+                "taxa_ocupacao": "8.33%"
             },
             {
                 "profissional": "Thamires",
                 "taxa_ocupacao": "7.32%"
-            },
-            {
-                "profissional": "Mohamad ",
-                "taxa_ocupacao": "4.17%"
             }
         ],
         "profissionais_stats_conversao": [
@@ -14197,8 +14201,8 @@
                 "taxa_conversao": "0.00%"
             }
         ],
-        "last_updated_iso": "2025-08-23T17:54:19.075982",
-        "last_updated_formatted": "17:54 - 23/08/2025"
+        "last_updated_iso": "2025-08-24T14:24:42.227267",
+        "last_updated_formatted": "14:24 - 24/08/2025"
     },
     "2025-08-23": {
         "agendas": {

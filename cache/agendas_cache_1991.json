@@ -3279,16 +3279,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 647,
                         "specialtyName": "Medicina do trabalho",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20154846,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "Cristiano Hack .",
                         "encaixe": false,
+                        "patientId": 22461183,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 824783,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 23464,
@@ -3302,16 +3304,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 691,
                         "specialtyName": "Urologia",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20154846,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "Cristiano Hack .",
                         "encaixe": false,
+                        "patientId": 22461183,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 824783,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 23464,
@@ -3580,16 +3584,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 630,
                         "specialtyName": "Dermatologia",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20150183,
+                        "appointmentStatus": "Marcado - confirmado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "DIOGO RODRIGUES GARCIA",
                         "encaixe": false,
+                        "patientId": 25067896,
+                        "statusId": 16,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 946562,
                         "interval": 15,
-                        "status": "Livre",
+                        "status": "Marcado - confirmado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 29086,
@@ -5246,12 +5252,12 @@
             "Inácio": {
                 "Marcado - confirmado": 48,
                 "Encaixe (Marcado - confirmado)": 1,
-                "Agendado": 26,
-                "Livre": 8
+                "Agendado": 28,
+                "Livre": 6
             },
             "Yuleysi": {
-                "Livre": 17,
-                "Marcado - confirmado": 1
+                "Marcado - confirmado": 2,
+                "Livre": 16
             },
             "Gabriela": {
                 "Marcado - confirmado": 14,
@@ -5267,12 +5273,12 @@
             }
         },
         "summary_metrics": {
-            "total_agendado_geral": 107,
-            "total_confirmado_geral": 72,
-            "percentual_confirmacao": "67.29%",
-            "total_ocupados": 107,
+            "total_agendado_geral": 110,
+            "total_confirmado_geral": 73,
+            "percentual_confirmacao": "66.36%",
+            "total_ocupados": 110,
             "total_slots_disponiveis": 152,
-            "percentual_ocupacao": "70.39%"
+            "percentual_ocupacao": "72.37%"
         },
         "conversion_data_for_selected_day": {
             "conversion_rate": "0.00%",
@@ -5297,7 +5303,7 @@
             },
             {
                 "profissional": "Inácio",
-                "taxa_confirmacao": "64.00%"
+                "taxa_confirmacao": "62.34%"
             }
         ],
         "profissionais_stats_ocupacao": [
@@ -5311,11 +5317,11 @@
             },
             {
                 "profissional": "Inácio",
-                "taxa_ocupacao": "90.36%"
+                "taxa_ocupacao": "92.77%"
             },
             {
                 "profissional": "Yuleysi",
-                "taxa_ocupacao": "5.56%"
+                "taxa_ocupacao": "11.11%"
             },
             {
                 "profissional": "Alexia",
@@ -5344,8 +5350,8 @@
                 "taxa_conversao": "0.00%"
             }
         ],
-        "last_updated_iso": "2025-08-23T17:54:26.352389",
-        "last_updated_formatted": "17:54 - 23/08/2025"
+        "last_updated_iso": "2025-08-24T14:24:48.517958",
+        "last_updated_formatted": "14:24 - 24/08/2025"
     },
     "2025-08-23": {
         "agendas": {

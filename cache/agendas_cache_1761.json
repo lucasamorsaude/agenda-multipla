@@ -5751,18 +5751,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 631,
                         "specialtyName": "Endocrinologia",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20147886,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "Karoline Santos De Lima",
                         "encaixe": false,
-                        "patientId": null,
-                        "statusId": null,
+                        "patientId": 3682266,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 799782,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 3886,
@@ -5801,18 +5801,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 631,
                         "specialtyName": "Endocrinologia",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20147280,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "GERSON VARGAS PEIXOTO",
                         "encaixe": false,
-                        "patientId": null,
-                        "statusId": null,
+                        "patientId": 3808992,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 799782,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 3886,
@@ -6306,18 +6306,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 664,
                         "specialtyName": "Ortopedia e traumatologia",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20154940,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "Janaina Leite Rodrigues ",
                         "encaixe": false,
-                        "patientId": null,
-                        "statusId": null,
+                        "patientId": 4937682,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 812765,
                         "interval": 15,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 15580,
@@ -7976,18 +7976,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 661,
                         "specialtyName": "Oftalmologia",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20147734,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "RITA DE CASSIA SGODA WISOSKI",
                         "encaixe": false,
-                        "patientId": null,
-                        "statusId": null,
+                        "patientId": 4685443,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 839352,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 22668,
@@ -9286,16 +9286,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20155756,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "ANDRESSA PAES DE SOUZA",
                         "encaixe": false,
+                        "patientId": 1052265,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 834897,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 26992,
@@ -9407,18 +9409,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20157441,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "Cleber Honório da Silva",
                         "encaixe": false,
-                        "patientId": null,
-                        "statusId": null,
+                        "patientId": 600413,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 834897,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 26992,
@@ -9680,16 +9682,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20153445,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "LUCAS HENRIQUE BODNAR",
                         "encaixe": false,
+                        "patientId": 23866763,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 834897,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 26992,
@@ -9895,16 +9899,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20147525,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "GUSTAVO SIPIAO DE MEDEIROS",
                         "encaixe": false,
+                        "patientId": 8209791,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 834897,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 26992,
@@ -11372,18 +11378,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 664,
                         "specialtyName": "Ortopedia e traumatologia",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20155156,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "Valdinéia Pereira Bonfim dos Santos",
                         "encaixe": false,
-                        "patientId": null,
-                        "statusId": null,
+                        "patientId": 2868978,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 812927,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 34771,
@@ -12236,16 +12242,16 @@
         },
         "resumo_geral": {
             "Irinalvo": {
-                "Agendado": 8,
+                "Agendado": 10,
                 "Marcado - confirmado": 17,
                 "Encaixe (Marcado - confirmado)": 5,
                 "Encaixe (Agendado)": 2,
-                "Livre": 5
+                "Livre": 3
             },
             "Fabiana": {
                 "Marcado - confirmado": 8,
-                "Agendado": 2,
-                "Livre": 4
+                "Agendado": 3,
+                "Livre": 3
             },
             "Tana Mara": {
                 "Marcado - confirmado": 12,
@@ -12262,24 +12268,23 @@
             "Dhiogo": {
                 "Marcado - confirmado": 23,
                 "Encaixe (Agendado)": 2,
-                "Agendado": 17,
+                "Agendado": 18,
                 "Encaixe (Marcado - confirmado)": 3,
-                "Livre": 2
+                "Livre": 1
             },
             "Gabrielle": {
                 "Agendado": 8,
                 "Marcado - confirmado": 6
             },
             "Antonio": {
-                "Livre": 25,
-                "Agendado": 16,
+                "Livre": 21,
+                "Agendado": 20,
                 "Marcado - confirmado": 10
             },
             "Pedro ": {
                 "Marcado - confirmado": 28,
-                "Agendado": 7,
-                "Encaixe (Marcado - confirmado)": 2,
-                "Livre": 1
+                "Agendado": 8,
+                "Encaixe (Marcado - confirmado)": 2
             },
             "Aline": {
                 "Agendado": 3,
@@ -12288,12 +12293,12 @@
             }
         },
         "summary_metrics": {
-            "total_agendado_geral": 220,
+            "total_agendado_geral": 229,
             "total_confirmado_geral": 135,
-            "percentual_confirmacao": "61.36%",
-            "total_ocupados": 220,
+            "percentual_confirmacao": "58.95%",
+            "total_ocupados": 229,
             "total_slots_disponiveis": 289,
-            "percentual_ocupacao": "76.12%"
+            "percentual_ocupacao": "79.24%"
         },
         "conversion_data_for_selected_day": {
             "conversion_rate": "0.00%",
@@ -12305,12 +12310,12 @@
                 "taxa_confirmacao": "83.33%"
             },
             {
-                "profissional": "Fabiana",
-                "taxa_confirmacao": "80.00%"
+                "profissional": "Pedro ",
+                "taxa_confirmacao": "73.68%"
             },
             {
-                "profissional": "Pedro ",
-                "taxa_confirmacao": "75.68%"
+                "profissional": "Fabiana",
+                "taxa_confirmacao": "72.73%"
             },
             {
                 "profissional": "Tana Mara",
@@ -12318,14 +12323,14 @@
             },
             {
                 "profissional": "Irinalvo",
-                "taxa_confirmacao": "53.12%"
-            },
-            {
-                "profissional": "Dhiogo",
-                "taxa_confirmacao": "51.11%"
+                "taxa_confirmacao": "50.00%"
             },
             {
                 "profissional": "Catherine",
+                "taxa_confirmacao": "50.00%"
+            },
+            {
+                "profissional": "Dhiogo",
                 "taxa_confirmacao": "50.00%"
             },
             {
@@ -12334,7 +12339,7 @@
             },
             {
                 "profissional": "Antonio",
-                "taxa_confirmacao": "38.46%"
+                "taxa_confirmacao": "33.33%"
             },
             {
                 "profissional": "Aline",
@@ -12360,23 +12365,23 @@
             },
             {
                 "profissional": "Pedro ",
-                "taxa_ocupacao": "97.37%"
+                "taxa_ocupacao": "100.00%"
             },
             {
                 "profissional": "Dhiogo",
-                "taxa_ocupacao": "95.74%"
+                "taxa_ocupacao": "97.87%"
             },
             {
                 "profissional": "Irinalvo",
-                "taxa_ocupacao": "86.49%"
+                "taxa_ocupacao": "91.89%"
             },
             {
                 "profissional": "Fabiana",
-                "taxa_ocupacao": "71.43%"
+                "taxa_ocupacao": "78.57%"
             },
             {
                 "profissional": "Antonio",
-                "taxa_ocupacao": "50.98%"
+                "taxa_ocupacao": "58.82%"
             },
             {
                 "profissional": "Aline",
@@ -12425,8 +12430,8 @@
                 "taxa_conversao": "0.00%"
             }
         ],
-        "last_updated_iso": "2025-08-23T17:54:11.586678",
-        "last_updated_formatted": "17:54 - 23/08/2025"
+        "last_updated_iso": "2025-08-24T14:24:37.062242",
+        "last_updated_formatted": "14:24 - 24/08/2025"
     },
     "2025-08-23": {
         "agendas": {

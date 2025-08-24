@@ -2,6 +2,7 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash
 import json
 from app.user_manager import load_users
+from app.activity_logger import log_activity
 
 auth_bp = Blueprint('auth', __name__, template_folder='../templates')
 
@@ -15,19 +16,17 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        users = load_users() # <-- USA A NOVA FUNÇÃO
+        users = load_users() 
         user_data = users.get(username)
 
         if user_data and user_data['senha'] == password:
             session['username'] = username
-
-            # Pega as unidades e ordena pelo nome (o valor do dicionário)
             unidades = user_data.get('unidades', {})
             sorted_unidades = dict(sorted(unidades.items(), key=lambda item: item[1]))
             session['unidades'] = sorted_unidades
+            session['role'] = user_data.get('role', 'user') 
 
-            # --- Adiciona a 'role' na sessão ---
-            session['role'] = user_data.get('role', 'user') # 'user' é o padrão
+            log_activity("LOGIN_SUCCESS", f"Usuário '{username}' logou com sucesso.")
 
             # Agora o len() deve usar o dicionário já ordenado
             if len(session['unidades']) == 1:
@@ -43,7 +42,9 @@ def login():
 
 @auth_bp.route('/logout')
 def logout():
+    username = session.get('username', 'Desconhecido') 
     session.clear()
+    log_activity("LOGOUT", f"Usuário '{username}' saiu do sistema.")
     flash('Você saiu do sistema.', 'info')
     return redirect(url_for('auth.login'))
 

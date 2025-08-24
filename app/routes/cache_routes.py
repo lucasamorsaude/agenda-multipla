@@ -1,7 +1,8 @@
 # app/routes/cache_routes.py
 from flask import Blueprint, request, jsonify, session
 from datetime import date, datetime
-from update_cache_script import process_and_cache_day 
+from update_cache_script import process_and_cache_day
+from app.activity_logger import log_activity
 
 cache_bp = Blueprint('cache', __name__)
 
@@ -20,8 +21,10 @@ def force_update_day_cache_sync():
     selected_date_str = request.form.get('selected_date_force_update', date.today().strftime('%Y-%m-%d'))
     selected_date = date.fromisoformat(selected_date_str)
     unit_name = session['unidades'].get(id_unidade, f"ID {id_unidade}")
+    user = session.get('username')
 
     try:
+        log_activity("CACHE_FORCED_UPDATE", f"Usuário '{user}' forçou atualização da unidade '{unit_name}' para o dia {selected_date_str}")
         print(f"Iniciando atualização para o dia {selected_date} na unidade {unit_name} (ID: {id_unidade}).")
         
         process_and_cache_day(selected_date, id_unidade)

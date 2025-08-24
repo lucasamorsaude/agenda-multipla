@@ -2,6 +2,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from functools import wraps
 from app.user_manager import load_users, save_users
+from app.activity_logger import log_activity
 
 user_bp = Blueprint('user', __name__, template_folder='../templates')
 
@@ -97,6 +98,7 @@ def add_user():
         return redirect(url_for('user.user_panel'))
 
     users[username] = {"senha": password, "role": role, "unidades": user_units}
+    log_activity("USER_CREATED", f"'{session.get('username')}' criou o usuário '{username}' com permissão '{role}'.")
     save_users(users)
     flash(f'Usuário "{username}" criado com sucesso!', 'success')
     return redirect(url_for('user.user_panel'))
@@ -117,6 +119,7 @@ def delete_user(username):
     # Verifica se o usuário logado tem permissão sobre o usuário alvo
     if _user_in_scope(users[username], session):
         del users[username]
+        log_activity("USER_DELETED", f"'{session.get('username')}' deletou o usuário '{username}'.")
         save_users(users)
         flash(f'Usuário "{username}" deletado com sucesso!', 'success')
     else:
@@ -147,6 +150,7 @@ def change_password(username):
     
     if can_change:
         users[username]['senha'] = new_password
+        log_activity("PASSWORD_CHANGED", f"'{session.get('username')}' alterou a senha do usuário '{username}'.")
         save_users(users)
         flash(f'Senha do usuário "{username}" alterada com sucesso!', 'success')
     else:

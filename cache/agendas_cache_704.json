@@ -4999,18 +4999,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 630,
                         "specialtyName": "Dermatologia",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20152355,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "JHONATAN DE CAMPOS",
                         "encaixe": false,
-                        "patientId": null,
-                        "statusId": null,
+                        "patientId": 945619,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 801589,
                         "interval": 15,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 3884,
@@ -5510,16 +5510,18 @@
                         "date": "25/08/2025",
                         "specialtyId": 625,
                         "specialtyName": "Clínica médica",
-                        "appointmentId": null,
-                        "appointmentStatus": null,
+                        "appointmentId": 20156263,
+                        "appointmentStatus": "Agendado",
                         "hasCanceledAppointments": false,
-                        "patient": null,
+                        "patient": "Helena Maria Nunes",
                         "encaixe": false,
+                        "patientId": 934287,
+                        "statusId": 2,
                         "isAssistedScheduling": false,
                         "overbookingAppointment": false,
                         "idSchedule": 776783,
                         "interval": 10,
-                        "status": "Livre",
+                        "status": "Agendado",
                         "returnAvailable": false,
                         "attendanceLocalId": 0,
                         "idProfessional": 6367,
@@ -9055,16 +9057,15 @@
             },
             "Augusto": {
                 "Marcado - confirmado": 11,
-                "Agendado": 2,
-                "Livre": 1
+                "Agendado": 3
             },
             "Tayane": {
                 "Marcado - confirmado": 2
             },
             "Gabrielle": {
-                "Livre": 48,
+                "Livre": 47,
                 "Marcado - confirmado": 5,
-                "Agendado": 1
+                "Agendado": 2
             },
             "Vitoria Thais": {
                 "Agendado": 2,
@@ -9089,12 +9090,12 @@
             }
         },
         "summary_metrics": {
-            "total_agendado_geral": 105,
+            "total_agendado_geral": 107,
             "total_confirmado_geral": 91,
-            "percentual_confirmacao": "86.67%",
-            "total_ocupados": 105,
+            "percentual_confirmacao": "85.05%",
+            "total_ocupados": 107,
             "total_slots_disponiveis": 189,
-            "percentual_ocupacao": "55.56%"
+            "percentual_ocupacao": "56.61%"
         },
         "conversion_data_for_selected_day": {
             "conversion_rate": "0.00%",
@@ -9114,20 +9115,20 @@
                 "taxa_confirmacao": "88.89%"
             },
             {
-                "profissional": "Augusto",
-                "taxa_confirmacao": "84.62%"
-            },
-            {
-                "profissional": "Gabrielle",
-                "taxa_confirmacao": "83.33%"
-            },
-            {
                 "profissional": "Vitoria Thais",
                 "taxa_confirmacao": "83.33%"
             },
             {
+                "profissional": "Augusto",
+                "taxa_confirmacao": "78.57%"
+            },
+            {
                 "profissional": "Ana Clara",
                 "taxa_confirmacao": "78.57%"
+            },
+            {
+                "profissional": "Gabrielle",
+                "taxa_confirmacao": "71.43%"
             },
             {
                 "profissional": "Thales",
@@ -9140,16 +9141,16 @@
                 "taxa_ocupacao": "100.00%"
             },
             {
+                "profissional": "Augusto",
+                "taxa_ocupacao": "100.00%"
+            },
+            {
                 "profissional": "Tayane",
                 "taxa_ocupacao": "100.00%"
             },
             {
                 "profissional": "Thales",
                 "taxa_ocupacao": "97.50%"
-            },
-            {
-                "profissional": "Augusto",
-                "taxa_ocupacao": "92.86%"
             },
             {
                 "profissional": "Ana Clara",
@@ -9165,7 +9166,7 @@
             },
             {
                 "profissional": "Gabrielle",
-                "taxa_ocupacao": "11.11%"
+                "taxa_ocupacao": "12.96%"
             }
         ],
         "profissionais_stats_conversao": [
@@ -9202,8 +9203,8 @@
                 "taxa_conversao": "0.00%"
             }
         ],
-        "last_updated_iso": "2025-08-23T17:54:04.556032",
-        "last_updated_formatted": "17:54 - 23/08/2025"
+        "last_updated_iso": "2025-08-24T14:24:31.976134",
+        "last_updated_formatted": "14:24 - 24/08/2025"
     },
     "2025-08-23": {
         "agendas": {

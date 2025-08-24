@@ -2,6 +2,7 @@
 from flask import Flask
 import os
 import json
+from app.activity_logger import log_activity
 
 def create_app():
     # Cria a instância do aplicativo Flask
@@ -14,6 +15,9 @@ def create_app():
         SECRET_KEY='sua-chave-secreta-muito-dificil-de-adivinhar-troque-isso',
     )
     
+    from app.activity_logger import init_db
+    init_db()
+
     # Carrega o cookie de um arquivo ou variável de ambiente
     try:
         with open('credentials.json', 'r') as f:
@@ -39,10 +43,27 @@ def create_app():
     app.register_blueprint(user_bp)
     app.register_blueprint(superadmin_bp)
 
+
+    from .activity_logger import log_activity
+    from flask import request
+
     # Adiciona uma rota raiz para redirecionar para o login
     @app.route('/')
     def root():
         from flask import redirect, url_for
         return redirect(url_for('auth.login'))
+    
+    @app.after_request
+    def log_request_activity(response):
+        # Ignora requisições para arquivos (css, js, etc.) para não poluir o log
+        if '.' in request.path:
+            return response
+        
+        # Monta a descrição da atividade
+        details = f"Rota: {request.path} | Método: {request.method} | Status: {response.status_code}"
+        log_activity("PAGE_VIEW", details)
+        
+        return response
 
     return app
+
