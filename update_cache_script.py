@@ -133,9 +133,10 @@ def process_and_cache_day(target_date: date, clinic_id: int):
         total_atendidos_debug = context.get("conversion_data_for_selected_day", {}).get("total_atendidos", "N/A")
         print(f"DEBUG [CACHE SCRIPT]: Métricas calculadas. Total de atendidos: {total_atendidos_debug}")
 
-    now = datetime.now()
-    context['last_updated_iso'] = now.isoformat()
-    context['last_updated_formatted'] = now.strftime('%H:%M - %d/%m/%Y')
+    
+    agora_gmt3 = datetime.utcnow() - timedelta(hours=3)
+    context['last_updated_iso'] = (datetime.utcnow() - timedelta(hours=3)).isoformat
+    context['last_updated_formatted'] = agora_gmt3.strftime('%Y-%m-%d %H:%M:%S')
 
     # Salva o dicionário 'context' completo no cache
     save_agendas_to_cache(context, target_date, clinic_id)

@@ -3447,6 +3447,31 @@
                         "overbookingSchedule": false
                     },
                     {
+                        "id": 32658184,
+                        "formatedHour": "9:15",
+                        "hour": 9.25,
+                        "date": "26/08/2025",
+                        "specialtyId": 679,
+                        "specialtyName": "Radiologia e diagnóstico por imagem",
+                        "appointmentId": 20218706,
+                        "appointmentStatus": "Agendado",
+                        "hasCanceledAppointments": false,
+                        "patient": "VERA LUCIA BISPO DOS SANTOS",
+                        "encaixe": true,
+                        "patientId": 22274767,
+                        "statusId": 2,
+                        "isAssistedScheduling": false,
+                        "overbookingAppointment": false,
+                        "idSchedule": 798781,
+                        "interval": 10,
+                        "status": "Encaixe",
+                        "returnAvailable": false,
+                        "attendanceLocalId": 0,
+                        "idProfessional": 22334,
+                        "professionalName": "Claudio Sampaio Inácio",
+                        "overbookingSchedule": false
+                    },
+                    {
                         "id": 27313035,
                         "formatedHour": "9:20",
                         "hour": 9.33,
@@ -4765,7 +4790,7 @@
             },
             "Claudio": {
                 "Agendado": 23,
-                "Encaixe (Agendado)": 3,
+                "Encaixe (Agendado)": 4,
                 "Marcado - confirmado": 1
             },
             "Cecília": {
@@ -4775,12 +4800,12 @@
             }
         },
         "summary_metrics": {
-            "total_agendado_geral": 75,
+            "total_agendado_geral": 76,
             "total_confirmado_geral": 5,
-            "percentual_confirmacao": "6.67%",
-            "total_ocupados": 75,
-            "total_slots_disponiveis": 198,
-            "percentual_ocupacao": "37.88%"
+            "percentual_confirmacao": "6.58%",
+            "total_ocupados": 76,
+            "total_slots_disponiveis": 199,
+            "percentual_ocupacao": "38.19%"
         },
         "conversion_data_for_selected_day": {
             "conversion_rate": "0.00%",
@@ -4801,7 +4826,7 @@
             },
             {
                 "profissional": "Claudio",
-                "taxa_confirmacao": "3.70%"
+                "taxa_confirmacao": "3.57%"
             },
             {
                 "profissional": "Liliam",
@@ -4864,8 +4889,8 @@
                 "taxa_conversao": "0.00%"
             }
         ],
-        "last_updated_iso": "2025-08-25T09:58:41.777028",
-        "last_updated_formatted": "09:58 - 25/08/2025"
+        "last_updated_iso": "2025-08-25T10:28:01.254839",
+        "last_updated_formatted": "10:28 - 25/08/2025"
     },
     "2025-08-25": {
         "agendas": {
