@@ -1,7 +1,7 @@
 # app/activity_logger.py
 import sqlite3
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import request, session
 
 DB_FILE = "activity.db"
@@ -37,7 +37,8 @@ def log_activity(action, details=""):
         
         username = session.get('username', 'Anônimo')
         ip_address = request.remote_addr if request else 'N/A'
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        agora_gmt3 = datetime.utcnow() - timedelta(hours=3)
+        timestamp = agora_gmt3.strftime('%Y-%m-%d %H:%M:%S')
 
         cursor.execute(
             "INSERT INTO activity_log (timestamp, username, ip_address, action, details) VALUES (?, ?, ?, ?, ?)",
