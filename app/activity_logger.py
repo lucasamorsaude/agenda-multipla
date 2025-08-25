@@ -37,10 +37,10 @@ def log_activity(action, details=""):
         
         username = session.get('username', 'Anônimo')
         ip_address = request.remote_addr if request else 'N/A'
-        agora_gmt3 = datetime.utcnow() - timedelta(hours=3)
-        timestamp = agora_gmt3.strftime('%Y-%m-%d %H:%M:%S')
+        # agora_gmt3 = datetime.utcnow() - timedelta(hours=3)
+        # timestamp = agora_gmt3.strftime('%Y-%m-%d %H:%M:%S')
 
-        # timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         cursor.execute(
             "INSERT INTO activity_log (timestamp, username, ip_address, action, details) VALUES (?, ?, ?, ?, ?)",
