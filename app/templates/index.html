@@ -71,10 +71,7 @@
                         </span>
                     {% endif %}
 
-                    <form id="force-update-form" class="mb-0">
-                        <input type="hidden" name="selected_date_force_update" value="{{ selected_date }}">
-                        <button type="submit" class="btn btn-outline-warning">Forçar Atualização do Dia</button>
-                    </form>
+                    <button id="force-update-single-btn" data-unit-id="{{ session['selected_unit_id'] }}" class="btn btn-outline-warning">Forçar Atualização</button>
                 </div>
 
             </div>
@@ -277,41 +274,43 @@
         const toast = new bootstrap.Toast(toastEl);
         const toastBody = document.getElementById('toast-body-message');
 
-        document.getElementById('force-update-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const button = this.querySelector('button');
-            const originalButtonText = button.innerHTML;
-            button.disabled = true;
-            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Atualizando...';
-            
-            const formData = new FormData(this);
+        const updateSingleButton = document.getElementById('force-update-single-btn');
+        if (updateSingleButton) {
+            updateSingleButton.addEventListener('click', function() {
+                const button = this;
+                const originalButtonText = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Atualizando...';
+                
+                const formData = new FormData();
+                formData.append('selected_date_force_update', document.getElementById('selected_date').value);
+                formData.append('unit_id', button.dataset.unitId); // Pega o ID do atributo data-unit-id
 
-            fetch("{{ url_for('cache.force_update_day_cache_sync') }}", {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                toastBody.textContent = data.message;
-                toast.show();
-                // Recarrega a página para mostrar os dados atualizados
-                if (data.status === 'success') {
-                    setTimeout(() => { window.location.reload(); }, 2000); // Espera 2s antes de recarregar
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao forçar atualização:', error);
-                toastBody.textContent = 'Erro de comunicação ao tentar atualizar.';
-                toast.show();
-            })
-            .finally(() => {
-                // Restaura o botão após um tempo para o usuário ver a mensagem
-                setTimeout(() => {
-                    button.disabled = false;
-                    button.innerHTML = originalButtonText;
-                }, 2000);
+                fetch("{{ url_for('cache.force_update_day_cache_sync') }}", {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    toastBody.textContent = data.message;
+                    toast.show();
+                    if (data.status === 'success') {
+                        setTimeout(() => { window.location.reload(); }, 2000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao forçar atualização:', error);
+                    toastBody.textContent = 'Erro de comunicação ao tentar atualizar.';
+                    toast.show();
+                })
+                .finally(() => {
+                    setTimeout(() => {
+                        button.disabled = false;
+                        button.innerHTML = originalButtonText;
+                    }, 2000);
+                });
             });
-        });
+        }
     </script>
 </body>
 </html>
