@@ -40,6 +40,8 @@ def log_activity(action, details=""):
         agora_gmt3 = datetime.utcnow() - timedelta(hours=3)
         timestamp = agora_gmt3.strftime('%Y-%m-%d %H:%M:%S')
 
+        #timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
         cursor.execute(
             "INSERT INTO activity_log (timestamp, username, ip_address, action, details) VALUES (?, ?, ?, ?, ?)",
             (timestamp, username, ip_address, action, details)
