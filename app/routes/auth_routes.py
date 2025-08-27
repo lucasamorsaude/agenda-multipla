@@ -1,25 +1,28 @@
 # app/routes/auth_routes.py
+
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash
-import json
-from app.user_manager import load_users
+# 1. IMPORTS CORRIGIDOS: Trocamos 'load_users' por 'get_user' e adicionamos 'check_password_hash'
+from app.user_manager import get_user
+from werkzeug.security import check_password_hash
 from app.activity_logger import log_activity
 
 auth_bp = Blueprint('auth', __name__, template_folder='../templates')
 
-def load_users():
-    # Assume que users.json está na raiz do projeto
-    with open('users.json', 'r', encoding='utf-8') as f:
-        return json.load(f)
+# 2. FUNÇÃO REMOVIDA: A função 'def load_users():' que estava aqui foi DELETADA.
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        users = load_users() 
-        user_data = users.get(username)
+        
+        # 3. LÓGICA ATUALIZADA:
+        # Busca o usuário DIRETAMENTE no Firestore
+        user_data = get_user(username)
 
-        if user_data and user_data['senha'] == password:
+        # A MÁGICA ACONTECE AQUI: Compara o hash salvo com a senha digitada 🔐
+        if user_data and 'password_hash' in user_data and check_password_hash(user_data['password_hash'], password):
+            # O resto do código continua igual, pois ele só usa os dados carregados
             session['username'] = username
             unidades = user_data.get('unidades', {})
             sorted_unidades = dict(sorted(unidades.items(), key=lambda item: item[1]))
@@ -28,7 +31,6 @@ def login():
 
             log_activity("LOGIN_SUCCESS", f"Usuário '{username}' logou com sucesso.")
 
-            # Agora o len() deve usar o dicionário já ordenado
             if len(session['unidades']) == 1:
                 unidade_id = list(session['unidades'].keys())[0]
                 session['selected_unit_id'] = unidade_id
@@ -37,9 +39,12 @@ def login():
             else:
                 return redirect(url_for('auth.select_unit'))
         else:
+            log_activity("LOGIN_FAILED", f"Tentativa de login falhou para o usuário '{username}'.")
             flash('Usuário ou senha inválidos.', 'danger')
+            
     return render_template('login.html')
 
+# AS OUTRAS ROTAS (logout, select_unit, set_unit) NÃO PRECISAM DE MUDANÇAS ✅
 @auth_bp.route('/logout')
 def logout():
     username = session.get('username', 'Desconhecido') 
@@ -60,7 +65,7 @@ def set_unit(unit_id):
         return redirect(url_for('auth.login'))
     if unit_id in session.get('unidades', {}):
         session['selected_unit_id'] = unit_id
-        return redirect(url_for('main.index')) # Note a mudança para 'main.index'
+        return redirect(url_for('main.index'))
     else:
         flash('Você não tem permissão para acessar esta unidade.', 'danger')
         return redirect(url_for('auth.select_unit'))

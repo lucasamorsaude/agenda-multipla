@@ -2,7 +2,10 @@
 from flask import Flask
 import os
 import json
-from app.activity_logger import log_activity
+
+import firebase_admin
+from firebase_admin import credentials
+
 
 def create_app():
     # Cria a instância do aplicativo Flask
@@ -15,8 +18,6 @@ def create_app():
         SECRET_KEY='sua-chave-secreta-muito-dificil-de-adivinhar-troque-isso',
     )
     
-    from app.activity_logger import init_db
-    init_db()
 
     # Carrega o cookie de um arquivo ou variável de ambiente
     try:
@@ -27,6 +28,14 @@ def create_app():
         cookie_value = ""
 
     app.config['COOKIE_VALUE'] = os.environ.get("COOKIE_VALUE", cookie_value)
+
+    if not firebase_admin._apps:
+        try:
+            cred = credentials.Certificate("chave_firebase.json")
+            firebase_admin.initialize_app(cred)
+            print(">>> Conexão com Firebase estabelecida com sucesso! <<<")
+        except Exception as e:
+            print(f">>> ERRO CRÍTICO: Falha ao conectar com o Firebase. Erro: {e} <<<")
 
     # --- Registrar Blueprints ---
     from .routes.auth_routes import auth_bp
@@ -56,10 +65,9 @@ def create_app():
     @app.after_request
     def log_request_activity(response):
         # Ignora requisições para arquivos (css, js, etc.) para não poluir o log
-        if '.' in request.path:
+        if '.' in request.path or request.path.startswith('/api/'):
             return response
         
-        # Monta a descrição da atividade
         details = f"Rota: {request.path} | Método: {request.method} | Status: {response.status_code}"
         log_activity("PAGE_VIEW", details)
         

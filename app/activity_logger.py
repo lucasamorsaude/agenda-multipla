@@ -1,52 +1,39 @@
-# app/activity_logger.py
-import sqlite3
-import os
-from datetime import datetime, timedelta
+# app/firebase_activity_logger.py
+from datetime import datetime
 from flask import request, session
+from firebase_admin import firestore
+import firebase_admin # Importe para usar firestore.SERVER_TIMESTAMP
 
-DB_FILE = "activity.db"
 
-def init_db():
-    """Cria a tabela de log no banco de dados, se ela não existir."""
-    if not os.path.exists(DB_FILE):
-        print("Criando banco de dados de atividade...")
-        conn = sqlite3.connect(DB_FILE)
-        cursor = conn.cursor()
-        cursor.execute('''
-            CREATE TABLE activity_log (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                timestamp TEXT NOT NULL,
-                username TEXT,
-                ip_address TEXT,
-                action TEXT NOT NULL,
-                details TEXT
-            )
-        ''')
-        conn.commit()
-        conn.close()
-        print("Banco de dados de atividade criado com sucesso.")
+# A função init_db() não é mais necessária!
+# O Firestore cria a coleção automaticamente quando o primeiro log for adicionado.
 
-def log_activity(action, details=""):
+def log_activity(action: str, details: str = ""):
     """
-    Registra uma ação no banco de dados de log.
+    Registra uma ação na coleção 'activity_log' do Firestore.
     Ex: log_activity("LOGIN_SUCCESS", "Usuário 'lucas' logou com sucesso.")
     """
     try:
-        conn = sqlite3.connect(DB_FILE)
-        cursor = conn.cursor()
+        db = firestore.client()
+        # Define a coleção onde os logs serão armazenados
+        log_collection_ref = db.collection('activity_log')
         
+        # Coleta os dados do contexto da requisição
         username = session.get('username', 'Anônimo')
         ip_address = request.remote_addr if request else 'N/A'
-        # agora_gmt3 = datetime.utcnow() - timedelta(hours=3)
-        # timestamp = agora_gmt3.strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Monta o dicionário com os dados do log
+        log_data = {
+            'timestamp': firestore.SERVER_TIMESTAMP, # Melhor prática: usa o timestamp do servidor do Google
+            'username': username,
+            'ip_address': ip_address,
+            'action': action,
+            'details': details
+        }
+        
+        # Adiciona um novo documento à coleção. O Firestore gera um ID único.
+        log_collection_ref.add(log_data)
 
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-        cursor.execute(
-            "INSERT INTO activity_log (timestamp, username, ip_address, action, details) VALUES (?, ?, ?, ?, ?)",
-            (timestamp, username, ip_address, action, details)
-        )
-        conn.commit()
-        conn.close()
     except Exception as e:
-        print(f"ERRO AO REGISTRAR LOG: {e}")
+        # Se ocorrer um erro, imprime no console para não quebrar a aplicação principal
+        print(f"ERRO AO REGISTRAR LOG NO FIRESTORE: {e}")

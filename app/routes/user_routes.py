@@ -1,7 +1,8 @@
 # app/routes/user_routes.py
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from functools import wraps
-from app.user_manager import load_users, save_users
+from app.user_manager import get_user, get_all_users, save_user, delete_user_from_db
+from werkzeug.security import generate_password_hash, check_password_hash
 from app.activity_logger import log_activity
 
 user_bp = Blueprint('user', __name__, template_folder='../templates')
@@ -44,7 +45,7 @@ def _user_in_scope(target_user_data, current_user_session):
 @user_bp.route('/users')
 @login_required
 def user_panel():
-    all_users = load_users()
+    all_users = get_all_users()
     current_user_role = session.get('role', 'user')
     current_username = session.get('username')
     
@@ -60,6 +61,7 @@ def user_panel():
     else: # user
         if current_username in all_users:
             users_to_display[current_username] = all_users[current_username]
+
             
     available_units = session.get('unidades', {})
     return render_template('users.html', users=users_to_display, available_units=available_units)
@@ -77,14 +79,11 @@ def add_user():
     role = request.form.get('role', 'user')
     unidades_ids = request.form.getlist('unidades')
 
-    if session.get('role') == 'admin' and role == 'admin':
-        flash('Admins não podem criar outros admins.', 'danger')
-        return redirect(url_for('user.user_panel'))
-
-    users = load_users()
-    if username in users:
+    if get_user(username):
         flash(f'Usuário "{username}" já existe!', 'danger')
         return redirect(url_for('user.user_panel'))
+
+    
 
     # A lógica para atribuir unidades já usa as unidades do admin logado, o que está correto.
     user_units = {}
@@ -97,9 +96,15 @@ def add_user():
         flash('Você deve selecionar pelo menos uma unidade válida para o novo usuário.', 'danger')
         return redirect(url_for('user.user_panel'))
 
-    users[username] = {"senha": password, "role": role, "unidades": user_units}
-    log_activity("USER_CREATED", f"'{session.get('username')}' criou o usuário '{username}' com permissão '{role}'.")
-    save_users(users)
+    hashed_password = generate_password_hash(password)
+    new_user_data = {
+        "password_hash": hashed_password, 
+        "role": role, 
+        "unidades": user_units
+    }
+    save_user(username, new_user_data)
+
+    log_activity("USER_CREATED", f"'{session.get('username')}' criou o usuário '{username}'.")
     flash(f'Usuário "{username}" criado com sucesso!', 'success')
     return redirect(url_for('user.user_panel'))
 
@@ -107,8 +112,9 @@ def add_user():
 @user_bp.route('/users/delete/<username>', methods=['POST'])
 @login_required
 def delete_user(username):
-    users = load_users()
-    if username not in users:
+    # ✅ Busque apenas os dados do usuário que será deletado
+    user_to_delete = get_user(username)
+    if not user_to_delete:
         flash('Usuário não encontrado.', 'danger')
         return redirect(url_for('user.user_panel'))
 
@@ -116,11 +122,11 @@ def delete_user(username):
         flash('Você não pode deletar seu próprio usuário.', 'danger')
         return redirect(url_for('user.user_panel'))
 
-    # Verifica se o usuário logado tem permissão sobre o usuário alvo
-    if _user_in_scope(users[username], session):
-        del users[username]
+    # A verificação de permissão usa os dados que buscamos
+    if _user_in_scope(user_to_delete, session):
+        # ✅ Chame a função correta para deletar do Firestore
+        delete_user_from_db(username)
         log_activity("USER_DELETED", f"'{session.get('username')}' deletou o usuário '{username}'.")
-        save_users(users)
         flash(f'Usuário "{username}" deletado com sucesso!', 'success')
     else:
         flash('Você não tem permissão para deletar este usuário.', 'danger')
@@ -136,8 +142,8 @@ def change_password(username):
         flash('A nova senha não pode estar em branco.', 'danger')
         return redirect(url_for('user.user_panel'))
 
-    users = load_users()
-    if username not in users:
+    user_data = get_user(username)
+    if not user_data:
         flash('Usuário não encontrado.', 'danger')
         return redirect(url_for('user.user_panel'))
 
@@ -146,12 +152,18 @@ def change_password(username):
     
     # Se não for o próprio usuário, verifica se ele está no escopo de gerenciamento
     if not can_change:
-        can_change = _user_in_scope(users[username], session)
+        can_change = _user_in_scope(user_data, session)
     
     if can_change:
-        users[username]['senha'] = new_password
+        # ✅ Gere o HASH da nova senha
+        hashed_password = generate_password_hash(new_password)
+        # ✅ Atualize o campo correto: 'password_hash'
+        user_data['password_hash'] = hashed_password
+        
+        # ✅ Salve os dados atualizados do usuário com a função correta
+        save_user(username, user_data)
+        
         log_activity("PASSWORD_CHANGED", f"'{session.get('username')}' alterou a senha do usuário '{username}'.")
-        save_users(users)
         flash(f'Senha do usuário "{username}" alterada com sucesso!', 'success')
     else:
         flash('Você não tem permissão para alterar a senha deste usuário.', 'danger')

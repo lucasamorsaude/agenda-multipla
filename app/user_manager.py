@@ -1,21 +1,42 @@
 # app/user_manager.py
-import json
-import os
+from firebase_admin import firestore
 
-USERS_FILE = 'users.json' # Garante que o caminho é relativo à raiz do projeto
-
-def load_users():
-    """Carrega os usuários do arquivo JSON com codificação UTF-8."""
+def get_user(username: str) -> dict | None:
+    """Busca um único usuário no Firestore pelo seu username."""
     try:
-        with open(USERS_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        # Se o arquivo não existe ou está vazio, retorna um dicionário vazio
+        db = firestore.client()
+        doc_ref = db.collection('users').document(username)
+        doc = doc_ref.get()
+        if doc.exists:
+            return doc.to_dict()
+        return None
+    except Exception as e:
+        print(f"ERRO ao buscar usuário '{username}': {e}")
+        return None
+
+def get_all_users() -> dict:
+    """Busca todos os usuários do Firestore."""
+    try:
+        db = firestore.client()
+        users_ref = db.collection('users').stream()
+        users_dict = {user.id: user.to_dict() for user in users_ref}
+        return users_dict
+    except Exception as e:
+        print(f"ERRO ao buscar todos os usuários: {e}")
         return {}
 
-def save_users(users_data):
-    """Salva os dados dos usuários no arquivo JSON com codificação UTF-8."""
-    with open(USERS_FILE, 'w', encoding='utf-8') as f:
-        # indent=4 para o arquivo ficar legível
-        # ensure_ascii=False para salvar acentos corretamente
-        json.dump(users_data, f, indent=4, ensure_ascii=False)
+def save_user(username: str, user_data: dict):
+    """Cria ou atualiza um usuário no Firestore."""
+    try:
+        db = firestore.client()
+        db.collection('users').document(username).set(user_data)
+    except Exception as e:
+        print(f"ERRO ao salvar usuário '{username}': {e}")
+
+def delete_user_from_db(username: str):
+    """Deleta um usuário do Firestore."""
+    try:
+        db = firestore.client()
+        db.collection('users').document(username).delete()
+    except Exception as e:
+        print(f"ERRO ao deletar usuário '{username}': {e}")
