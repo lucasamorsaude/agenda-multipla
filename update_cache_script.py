@@ -1,6 +1,7 @@
 import sys
 import os
 from datetime import date, timedelta, datetime
+from zoneinfo import ZoneInfo
 import json
 import requests
 import pandas as pd
@@ -134,7 +135,7 @@ def process_and_cache_day(target_date: date, clinic_id: int):
         print(f"DEBUG [CACHE SCRIPT]: Métricas calculadas. Total de atendidos: {total_atendidos_debug}")
 
     
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("America/Sao_Paulo"))
     context['last_updated_iso'] = now.isoformat()
     context['last_updated_formatted'] = now.strftime('%H:%M - %d/%m/%Y')
 
