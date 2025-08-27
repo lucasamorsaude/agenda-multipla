@@ -1,18 +1,24 @@
 # app/routes/superadmin_routes.py
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash
 from functools import wraps
-from datetime import date
+from datetime import date, datetime, timedelta
 import pandas as pd
 import sqlite3
 import io
 from flask import Response
+from zoneinfo import ZoneInfo
 
+
+from firebase_admin import firestore
 # Importe suas funções de métricas e cache
 from cache_manager import load_agendas_from_cache
 from metrics import (
     calculate_summary_metrics, 
     calculate_global_conversion_rate
 )
+
+SAO_PAULO_TZ = ZoneInfo("America/Sao_Paulo") # <-- MUDANÇA 2: Definir fuso horário
+
 
 superadmin_bp = Blueprint('superadmin', __name__, template_folder='../templates')
 
@@ -109,142 +115,110 @@ def dashboard():
 @superadmin_bp.route('/superadmin/activity-log')
 @superadmin_required
 def activity_log():
-    # Pega os parâmetros de filtro da URL, incluindo as novas datas
-    search_user = request.args.get('username', '')
-    search_action = request.args.get('action', '')
-    search_details = request.args.get('details', '')
-    search_start_date = request.args.get('start_date', '')
-    search_end_date = request.args.get('end_date', '')
-
-    logs = []
-    all_usernames = []
-    all_actions = []
-
-    try:
-        conn = sqlite3.connect("activity.db")
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-
-        # Busca opções para os filtros (sem alteração aqui)
-        cursor.execute("SELECT DISTINCT username FROM activity_log ORDER BY username")
-        all_usernames = cursor.fetchall()
-        cursor.execute("SELECT DISTINCT action FROM activity_log ORDER BY action")
-        all_actions = cursor.fetchall()
-
-        # Constrói a busca no banco de dados dinamicamente
-        query = "SELECT * FROM activity_log"
-        conditions = []
-        params = []
-
-        if search_user:
-            conditions.append("username = ?")
-            params.append(search_user)
-        if search_action:
-            conditions.append("action = ?")
-            params.append(search_action)
-        if search_details:
-            conditions.append("details LIKE ?")
-            params.append(f"%{search_details}%")
-        
-        # --- LÓGICA NOVA PARA DATAS ---
-        if search_start_date:
-            conditions.append("timestamp >= ?")
-            params.append(f"{search_start_date} 00:00:00") # Começo do dia
-        if search_end_date:
-            conditions.append("timestamp <= ?")
-            params.append(f"{search_end_date} 23:59:59") # Fim do dia
-        # --------------------------------
-
-        if conditions:
-            query += " WHERE " + " AND ".join(conditions)
-
-        query += " ORDER BY id DESC LIMIT 500"
-        
-        cursor.execute(query, params)
-        logs = cursor.fetchall()
-        
-        conn.close()
-    except Exception as e:
-        flash(f"Erro ao carregar logs: {e}", "danger")
-
-    # Passa os filtros atuais de volta para o template
+    db = firestore.client()
     current_filters = {
-        'username': search_user,
-        'action': search_action,
-        'details': search_details,
-        'start_date': search_start_date, # <-- NOVO
-        'end_date': search_end_date      # <-- NOVO
+        'username': request.args.get('username', ''), 'action': request.args.get('action', ''),
+        'start_date': request.args.get('start_date', ''), 'end_date': request.args.get('end_date', ''),
+        'details': request.args.get('details', '')
     }
 
-    return render_template('activity_log.html', 
-                           logs=logs, 
-                           all_usernames=all_usernames,
-                           all_actions=all_actions,
-                           current_filters=current_filters)
+    try:
+        query = db.collection('activity_log')
+        if current_filters['username']:
+            query = query.where('username', '==', current_filters['username'])
+        if current_filters['action']:
+            query = query.where('action', '==', current_filters['action'])
+        if current_filters['start_date']:
+            start_dt = datetime.fromisoformat(current_filters['start_date'])
+            query = query.where('timestamp', '>=', start_dt)
+        if current_filters['end_date']:
+            end_dt = datetime.fromisoformat(current_filters['end_date']) + timedelta(days=1)
+            query = query.where('timestamp', '<', end_dt)
+        
+        # Firestore não suporta busca 'LIKE'. Uma busca exata é possível.
+        if current_filters['details']:
+            query = query.where('details', '==', current_filters['details'])
+
+        query = query.order_by('timestamp', direction=firestore.Query.DESCENDING).limit(500)
+        logs_from_db = query.stream()
+        
+        logs = []
+        for log in logs_from_db:
+            log_data = log.to_dict()
+            if 'timestamp' in log_data and isinstance(log_data['timestamp'], datetime):
+                # <-- MUDANÇA 3: Converte para o fuso de SP e formata
+                log_data['timestamp'] = log_data['timestamp'].astimezone(SAO_PAULO_TZ).strftime('%d/%m/%Y %H:%M:%S')
+            logs.append(log_data)
+
+        # Popula os menus de filtro
+        all_logs_docs = db.collection('activity_log').stream()
+        all_usernames_set = {doc.to_dict().get('username') for doc in all_logs_docs if doc.to_dict().get('username')}
+        
+        # Reset stream to re-iterate
+        all_logs_docs = db.collection('activity_log').stream()
+        all_actions_set = {doc.to_dict().get('action') for doc in all_logs_docs if doc.to_dict().get('action')}
+
+        all_usernames = [{'username': name} for name in sorted(list(all_usernames_set))]
+        all_actions = [{'action': act} for act in sorted(list(all_actions_set))]
+
+    except Exception as e:
+        flash(f"Erro ao carregar logs do Firestore: {e}", "danger")
+        logs, all_usernames, all_actions = [], [], []
+
+    return render_template('activity_log.html', logs=logs, all_usernames=all_usernames,
+                           all_actions=all_actions, current_filters=current_filters)
 
 
 @superadmin_bp.route('/superadmin/activity-log/export')
 @superadmin_required
 def export_activity_log():
-    # 1. Reutiliza exatamente a mesma lógica de filtros da página de visualização
-    search_user = request.args.get('username', '')
-    search_action = request.args.get('action', '')
-    search_details = request.args.get('details', '')
-    search_start_date = request.args.get('start_date', '')
-    search_end_date = request.args.get('end_date', '')
-
+    db = firestore.client()
     try:
-        conn = sqlite3.connect("activity.db")
-        # A busca no banco é idêntica à da outra rota
-        query = "SELECT id, timestamp, username, ip_address, action, details FROM activity_log"
-        conditions = []
-        params = []
-
-        if search_user:
-            conditions.append("username = ?")
-            params.append(search_user)
-        if search_action:
-            conditions.append("action = ?")
-            params.append(search_action)
-        if search_details:
-            conditions.append("details LIKE ?")
-            params.append(f"%{search_details}%")
-        if search_start_date:
-            conditions.append("timestamp >= ?")
-            params.append(f"{search_start_date} 00:00:00")
-        if search_end_date:
-            conditions.append("timestamp <= ?")
-            params.append(f"{search_end_date} 23:59:59")
-
-        if conditions:
-            query += " WHERE " + " AND ".join(conditions)
-        query += " ORDER BY id DESC" # Pega todos os resultados, sem limite de 500
+        # Reutiliza a mesma lógica de query da rota anterior, mas sem o .limit()
+        query = db.collection('activity_log')
+        if request.args.get('username'):
+            query = query.where('username', '==', request.args.get('username'))
+        if request.args.get('action'):
+            query = query.where('action', '==', request.args.get('action'))
+        if request.args.get('start_date'):
+            start_dt = datetime.fromisoformat(request.args.get('start_date'))
+            query = query.where('timestamp', '>=', start_dt)
+        if request.args.get('end_date'):
+            end_dt = datetime.fromisoformat(request.args.get('end_date')) + timedelta(days=1)
+            query = query.where('timestamp', '<', end_dt)
+        if request.args.get('details'):
+            query = query.where('details', '==', request.args.get('details'))
         
-        # 2. Carrega os dados em um DataFrame do Pandas
-        df = pd.read_sql_query(query, conn, params=params)
-        conn.close()
+        query = query.order_by('timestamp', direction=firestore.Query.DESCENDING)
+        docs = query.stream()
 
-        if df.empty:
-            flash("Nenhum dado encontrado para exportar com os filtros selecionados.", "warning")
+        logs_list = []
+        for doc in docs:
+            log_data = doc.to_dict()
+            if 'timestamp' in log_data and isinstance(log_data['timestamp'], datetime):
+                # <-- MUDANÇA 4: Converte para o fuso de SP e formata
+                log_data['timestamp'] = log_data['timestamp'].astimezone(SAO_PAULO_TZ).strftime('%d/%m/%Y %H:%M:%S')
+            logs_list.append(log_data)
+
+        if not logs_list:
+            flash("Nenhum dado encontrado para exportar.", "warning")
             return redirect(url_for('superadmin.activity_log'))
 
-        # Renomeia as colunas para o arquivo Excel
-        df.columns = ['ID', 'Data/Hora', 'Usuário', 'Endereço IP', 'Ação', 'Detalhes']
+        df = pd.DataFrame(logs_list)
+        # Reordena e renomeia colunas para o Excel
+        df = df[['timestamp', 'username', 'ip_address', 'action', 'details']]
+        df.columns = ['Data/Hora', 'Usuário', 'Endereço IP', 'Ação', 'Detalhes']
         
-        # 3. Cria o arquivo Excel em memória
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             df.to_excel(writer, index=False, sheet_name='Log_de_Atividades')
         output.seek(0)
 
-        # 4. Retorna o arquivo para download
         filename = f"log_atividades_{date.today().strftime('%Y-%m-%d')}.xlsx"
-        return Response(
-            output,
-            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={"Content-Disposition": f"attachment;filename={filename}"}
-        )
+        return Response(output, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        headers={"Content-Disposition": f"attachment;filename={filename}"})
 
     except Exception as e:
         flash(f"Erro ao exportar dados: {e}", "danger")
         return redirect(url_for('superadmin.activity_log'))
+    
