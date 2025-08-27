@@ -3,3 +3,4 @@ Flask
 datetime
 pandas
 gunicorn
+firebase_admin
