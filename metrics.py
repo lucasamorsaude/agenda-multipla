@@ -44,16 +44,43 @@ def calculate_confirmation_ranking(df):
     return sorted(stats, key=lambda x: float(x['taxa_confirmacao'][:-1]), reverse=True)
 
 def calculate_occupation_ranking(df):
-    """Calcula o ranking de taxa de ocupação por profissional."""
+    """Calcula o ranking de taxa de ocupação por profissional, com lógica explícita."""
     stats = []
+
+    # DEFINA AQUI TODOS OS STATUS QUE VOCÊ CONSIDERA COMO "OCUPADO"
+    # Adicione ou remova status desta lista conforme a regra da sua clínica
+    status_considerados_ocupados = [
+        "Agendado",
+        "Marcado - confirmado",
+        "Aguardando pós-consulta",
+        "Em atendimento",
+        "Aguardando atendimento",
+        "Atendimento acolhimento",
+        "Aguardando acolhimento",
+        "Atendido",
+        "Atendido pós-consulta",
+        "Não compareceu"
+        # Status como 'Encaixe (...)' serão pegos pela lógica abaixo
+    ]
+
     for prof, row in df.iterrows():
-        ocupados = row.sum() - row.get('Livre', 0) - row.get('Bloqueado', 0)
+        ocupados = 0
+        # Soma apenas os status que devem ser contados como ocupados
+        for status in row.index:
+            # Verifica se o nome do status contém algum dos status da nossa lista
+            # Isso garante que "Encaixe (Agendado)" conte como "Agendado", por exemplo.
+            if any(s in status for s in status_considerados_ocupados):
+                ocupados += row[status]
+
+        # O total de slots é a soma de todos os horários do profissional
         total_slots = row.sum()
+        
         taxa = (ocupados / total_slots * 100) if total_slots > 0 else 0
         stats.append({
             "profissional": prof,
             "taxa_ocupacao": f"{taxa:.2f}%"
         })
+        
     return sorted(stats, key=lambda x: float(x['taxa_ocupacao'][:-1]), reverse=True)
 
 def calculate_conversion_ranking(df):
