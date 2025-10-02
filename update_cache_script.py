@@ -10,6 +10,7 @@ import pandas as pd
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from cache_manager import save_agendas_to_cache
+from cache_manager import delete_day_from_cache  # Importa a função para deletar o cache de um dia
 # Importando as funções de métrica com os nomes corretos
 from metrics import (
     calculate_summary_metrics,
@@ -140,6 +141,7 @@ def process_and_cache_day(target_date: date, clinic_id: int):
     context['last_updated_formatted'] = now.strftime('%H:%M - %d/%m/%Y')
 
     # Salva o dicionário 'context' completo no cache
+    delete_day_from_cache(target_date, clinic_id)  # Limpa o cache antigo
     save_agendas_to_cache(context, target_date, clinic_id)
     print(f"--- [CACHE SCRIPT] Cache para {target_date.strftime('%Y-%m-%d')} atualizado com sucesso. ---")
 
