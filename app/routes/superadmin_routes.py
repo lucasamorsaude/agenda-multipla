@@ -11,7 +11,7 @@ from zoneinfo import ZoneInfo
 
 from firebase_admin import firestore
 # Importe suas funções de métricas e cache
-from cache_manager import load_agendas_from_cache
+from cache_manager import load_agendas_from_cache_v2
 from metrics import (
     calculate_summary_metrics, 
     calculate_global_conversion_rate
@@ -50,7 +50,7 @@ def dashboard():
     # IMPORTANTE: Este painel depende dos caches diários de cada unidade.
     # Ele não busca dados da API em tempo real para não sobrecarregar o sistema.
     for unit_id, unit_name in all_units.items():
-        cached_data = load_agendas_from_cache(selected_date, unit_id)
+        cached_data = load_agendas_from_cache_v2(selected_date, unit_id)
         
         if cached_data and cached_data.get('resumo_geral'):
             resumo_geral_unit = cached_data['resumo_geral']

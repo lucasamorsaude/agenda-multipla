@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, session, redirect, url_fo
 from datetime import date, datetime
 import pandas as pd
 from login_auth import get_auth_new
-from cache_manager import load_agendas_from_cache, save_agendas_to_cache
+from cache_manager import load_agendas_from_cache_v2, save_agendas_to_cache_v2
 # Importando as novas funções de forma organizada
 from metrics import (
     calculate_summary_metrics, 
@@ -65,7 +65,7 @@ def index():
 
     
     context = _get_default_context()
-    cached_data = load_agendas_from_cache(selected_date, id_unidade_selecionada)
+    cached_data = load_agendas_from_cache_v2(selected_date, id_unidade_selecionada)
 
     if cached_data and cached_data.get('agendas'):
         print(f"SUCESSO: Usando dados do cache para {selected_date_str}.")
@@ -130,7 +130,7 @@ def index():
                 context['last_updated_iso'] = now.isoformat() # Formato para o computador
                 context['last_updated_formatted'] = now.strftime('%H:%M - %d/%m/%Y') # Formato para exibição
                 
-                save_agendas_to_cache(context, selected_date, id_unidade_selecionada)
+                save_agendas_to_cache_v2(context, selected_date, id_unidade_selecionada)
         else:
             print("ERRO: A chamada get_all_professionals não retornou dados.")
 
