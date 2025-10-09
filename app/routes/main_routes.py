@@ -98,6 +98,7 @@ def index():
                 if any(slot.get('status') not in ["Livre", "Bloqueado"] for slot in slots):
                     context["agendas"][prof_nome] = {
                         "id": prof_id,
+                        "nome": prof_nome,
                         "horarios": sorted(slots, key=lambda x: x.get('numeric_hour', 0.0))
                     }
                     

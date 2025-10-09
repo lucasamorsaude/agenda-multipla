@@ -78,7 +78,7 @@ def load_agendas_from_cache_v2(target_date: date, unit_id: str) -> dict | None:
         agendas_subcollection = day_doc_ref.collection('agendas')
         for prof_doc in agendas_subcollection.stream():
             prof_data = prof_doc.to_dict()
-            prof_nome = prof_data.get('professionalName', prof_doc.id) # Usa o nome do profissional se disponível
+            prof_nome = prof_data.get('nome', prof_doc.id) # Usa o nome do profissional se disponível
             context['agendas'][prof_nome] = prof_data
         
         print(f"Cache V2 para {target_date.strftime('%Y-%m-%d')} carregado com sucesso.")
