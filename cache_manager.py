@@ -1,148 +1,121 @@
-# firebase_cache_manager.py
+# app/cache_manager.py
 
-from datetime import date
-from firebase_admin import credentials, firestore
-import firebase_admin
-from dotenv import load_dotenv
 import os
 import json
+from datetime import date
+from supabase import create_client, Client
+from dotenv import load_dotenv
 
-# --- INICIALIZAÇÃO DO FIREBASE ---
-# Coloque este bloco de código no seu arquivo principal (app.py) 
-# ou garanta que ele rode uma única vez quando sua aplicação iniciar.
-
-# Carrega as variáveis do arquivo .env para o ambiente
+# --- INICIALIZAÇÃO DO CLIENTE SUPABASE ---
 load_dotenv()
+url: str = os.environ.get("SUPABASE_URL")
+key: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+supabase: Client = create_client(url, key)
 
-cred = None
-
-# 1. Tenta carregar do ambiente (Modo Produção - Railway)
-cred_json_string = os.environ.get('FIREBASE_CREDENTIALS_JSON')
-if cred_json_string:
-    print("Iniciando em modo PRODUÇÃO (Railway)")
-    cred_dict = json.loads(cred_json_string)
-    cred = credentials.Certificate(cred_dict)
-else:
-    # 2. Tenta carregar do caminho no .env (Modo Local)
-    cred_path = os.environ.get('FIREBASE_CREDENTIALS_PATH')
-    if cred_path:
-        print("Iniciando em modo LOCAL")
-        cred = credentials.Certificate(cred_path)
-    else:
-        print("Erro: Nenhuma credencial do Firebase encontrada.")
-
-# Inicializa o app se a credencial foi carregada
-if cred and not firebase_admin._apps:
-    firebase_admin.initialize_app(cred)
-else:
-    print("Firebase já inicializado ou credenciais ausentes.")
-
-# Crie um cliente para interagir com o Firestore
-db = firestore.client()
-# -----------------------------------
-
-
-def _get_day_document_ref(target_date: date, unit_id: str):
-    """NOVO: Retorna a referência do documento para o DIA específico."""
-    document_id = f"{unit_id}_{target_date.strftime('%Y-%m-%d')}"
-    return db.collection('agendas_cache').document(document_id)
+# --- FUNÇÕES DO CACHE ---
 
 def save_agendas_to_cache_v2(context: dict, target_date: date, unit_id: str):
-    """
-    NOVA VERSÃO OTIMIZADA: Salva métricas no documento principal e agendas em uma subcoleção.
-    """
-    day_doc_ref = _get_day_document_ref(target_date, unit_id)
-    agendas_data = context.pop("agendas", {}) # Remove as agendas do context principal
-
+    """Salva os dados de agenda e métricas nas tabelas do Supabase."""
     try:
-        # Usa um batch para garantir que tudo seja salvo de uma vez (operação atômica)
-        batch = db.batch()
+        unit_id_int = int(unit_id)
+        date_str = target_date.strftime('%Y-%m-%d')
+        
+        # 1. Separa os dados das agendas do contexto principal
+        agendas_data = context.pop("agendas", {})
 
-        # 1. Salva as métricas e o resto do context no documento do dia
-        batch.set(day_doc_ref, context)
+        # 2. Salva (ou atualiza) o resumo na tabela 'agendas_cache_summary'
+        # O 'context' restante vai para a coluna JSONB 'summary_data'
+        summary_payload = {
+            "unit_id": unit_id_int,
+            "target_date": date_str,
+            "summary_data": context
+        }
+        supabase.table('agendas_cache_summary').upsert(summary_payload).execute()
 
-        # 2. Itera sobre os profissionais e salva cada um em um documento separado na subcoleção
-        agendas_subcollection = day_doc_ref.collection('agendas')
-        for prof_nome, prof_data in agendas_data.items():
-            prof_id = prof_data.get("id")
-            if prof_id:
-                prof_doc_ref = agendas_subcollection.document(str(prof_id))
-                batch.set(prof_doc_ref, prof_data)
+        # 3. Prepara e salva os detalhes das agendas na tabela 'agendas_cache_details'
+        if agendas_data:
+            details_payload = []
+            for prof_nome, prof_data in agendas_data.items():
+                prof_id = prof_data.get("id")
+                if prof_id:
+                    details_payload.append({
+                        "unit_id": unit_id_int,
+                        "target_date": date_str,
+                        "professional_id": prof_id,
+                        "professional_name": prof_nome,
+                        "schedule_data": prof_data # O dict inteiro do profissional vai para o JSONB
+                    })
+            
+            if details_payload:
+                supabase.table('agendas_cache_details').upsert(details_payload).execute()
 
-        # 3. Commita o batch
-        batch.commit()
-        print(f"Cache V2 para {target_date.strftime('%Y-%m-%d')} (unidade: {unit_id}) salvo com sucesso.")
+        print(f"Cache para {date_str} (unidade: {unit_id}) salvo com sucesso no Supabase.")
 
     except Exception as e:
-        print(f"Erro CRÍTICO ao salvar cache V2 no Firestore. Erro: {e}")
-        # Se deu erro, adiciona as agendas de volta ao context para não perder os dados na memória
+        print(f"Erro CRÍTICO ao salvar cache no Supabase. Erro: {e}")
+        # Adiciona os dados de volta ao context em caso de falha
         context['agendas'] = agendas_data
 
 def load_agendas_from_cache_v2(target_date: date, unit_id: str) -> dict | None:
-    """
-    NOVA VERSÃO OTIMIZADA: Carrega o documento do dia e a subcoleção de agendas.
-    """
-    day_doc_ref = _get_day_document_ref(target_date, unit_id)
-    
+    """Carrega os dados de agenda e métricas do cache do Supabase."""
     try:
-        # 1. Carrega o documento principal (métricas)
-        doc = day_doc_ref.get()
-        if not doc.exists:
-            print(f"Cache V2 para o dia {target_date.strftime('%Y-%m-%d')} não encontrado.")
+        unit_id_int = int(unit_id)
+        date_str = target_date.strftime('%Y-%m-%d')
+
+        # 1. Carrega o resumo da tabela principal
+        summary_response = supabase.table('agendas_cache_summary') \
+            .select('summary_data') \
+            .eq('unit_id', unit_id_int) \
+            .eq('target_date', date_str) \
+            .maybe_single() \
+            .execute()
+
+        if not summary_response.data:
+            print(f"Cache para o dia {date_str} (unidade: {unit_id}) não encontrado.")
             return None
         
-        context = doc.to_dict()
+        # O contexto principal vem da coluna 'summary_data'
+        context = summary_response.data['summary_data']
         context['agendas'] = {}
 
-        # 2. Carrega todos os documentos da subcoleção de agendas
-        agendas_subcollection = day_doc_ref.collection('agendas')
-        for prof_doc in agendas_subcollection.stream():
-            prof_data = prof_doc.to_dict()
-            prof_nome = prof_data.get('nome', prof_doc.id) # Usa o nome do profissional se disponível
-            context['agendas'][prof_nome] = prof_data
-        
-        print(f"Cache V2 para {target_date.strftime('%Y-%m-%d')} carregado com sucesso.")
+        # 2. Carrega todas as agendas de profissionais da tabela de detalhes
+        details_response = supabase.table('agendas_cache_details') \
+            .select('professional_name, schedule_data') \
+            .eq('unit_id', unit_id_int) \
+            .eq('target_date', date_str) \
+            .execute()
+
+        # 3. Remonta o dicionário 'agendas' no formato original
+        if details_response.data:
+            for item in details_response.data:
+                prof_nome = item['professional_name']
+                context['agendas'][prof_nome] = item['schedule_data']
+
+        print(f"Cache para {date_str} (unidade: {unit_id}) carregado com sucesso do Supabase.")
         return context
 
     except Exception as e:
-        print(f"Erro CRÍTICO ao carregar cache V2 do Firestore. Erro: {e}")
+        print(f"Erro CRÍTICO ao carregar cache do Supabase. Erro: {e}")
         return None
 
 def delete_day_from_cache_v2(target_date: date, unit_id: str):
     """
-    NOVA VERSÃO: Deleta o documento do dia e TODOS os documentos na sua subcoleção de agendas.
+    Deleta o cache de um dia. MUITO MAIS SIMPLES com SQL!
     """
-    day_doc_ref = _get_day_document_ref(target_date, str(unit_id))
-    
     try:
-        # PASSO 1: Deletar todos os documentos da subcoleção 'agendas' em lotes.
-        # Esta é a maneira recomendada pelo Google para deletar subcoleções inteiras.
-        agendas_subcollection = day_doc_ref.collection('agendas')
-        
-        # O loop continua enquanto houver documentos a serem deletados no lote.
-        while True:
-            # Pega um lote de até 500 documentos (limite do batch)
-            docs_to_delete = agendas_subcollection.limit(500).stream()
-            
-            batch = db.batch()
-            doc_count_in_batch = 0
-            
-            for doc in docs_to_delete:
-                batch.delete(doc.reference)
-                doc_count_in_batch += 1
-            
-            # Se não encontrou nenhum documento no lote, a subcoleção está vazia.
-            if doc_count_in_batch == 0:
-                break
-                
-            # Envia o lote de deleções para o Firestore
-            batch.commit()
-            print(f"Lote de {doc_count_in_batch} documentos de agenda deletado.")
+        unit_id_int = int(unit_id)
+        date_str = target_date.strftime('%Y-%m-%d')
 
-        # PASSO 2: Depois que a subcoleção estiver vazia, deletar o documento principal.
-        day_doc_ref.delete()
+        # Graças ao "ON DELETE CASCADE" que definimos no SQL,
+        # basta deletar o registro da tabela de resumo.
+        # O banco de dados se encarrega de deletar todos os detalhes associados.
+        supabase.table('agendas_cache_summary') \
+            .delete() \
+            .eq('unit_id', unit_id_int) \
+            .eq('target_date', date_str) \
+            .execute()
         
-        print(f"Cache V2 para {target_date.strftime('%Y-%m-%d')} (unidade: {unit_id}) deletado com sucesso.")
+        print(f"Cache para {date_str} (unidade: {unit_id}) deletado com sucesso do Supabase.")
 
     except Exception as e:
-        print(f"Erro CRÍTICO ao deletar cache V2 do Firestore para o dia {target_date.strftime('%Y-%m-%d')}. Erro: {e}")
+        print(f"Erro CRÍTICO ao deletar cache do Supabase para o dia {date_str}. Erro: {e}")
