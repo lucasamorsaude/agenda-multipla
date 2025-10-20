@@ -5,6 +5,7 @@ import json
 
 import firebase_admin
 from firebase_admin import credentials
+from dotenv import load_dotenv
 
 
 def create_app():
@@ -28,14 +29,32 @@ def create_app():
         cookie_value = ""
 
     app.config['COOKIE_VALUE'] = os.environ.get("COOKIE_VALUE", cookie_value)
+    
+    # Carrega as variáveis do arquivo .env para o ambiente
+    load_dotenv()
 
-    if not firebase_admin._apps:
-        try:
-            cred = credentials.Certificate("chave_firebase.json")
-            firebase_admin.initialize_app(cred)
-            print(">>> Conexão com Firebase estabelecida com sucesso! <<<")
-        except Exception as e:
-            print(f">>> ERRO CRÍTICO: Falha ao conectar com o Firebase. Erro: {e} <<<")
+    cred = None
+
+    # 1. Tenta carregar do ambiente (Modo Produção - Railway)
+    cred_json_string = os.environ.get('FIREBASE_CREDENTIALS_JSON')
+    if cred_json_string:
+        print("Iniciando em modo PRODUÇÃO (Railway)")
+        cred_dict = json.loads(cred_json_string)
+        cred = credentials.Certificate(cred_dict)
+    else:
+        # 2. Tenta carregar do caminho no .env (Modo Local)
+        cred_path = os.environ.get('FIREBASE_CREDENTIALS_PATH')
+        if cred_path:
+            print("Iniciando em modo LOCAL")
+            cred = credentials.Certificate(cred_path)
+        else:
+            print("Erro: Nenhuma credencial do Firebase encontrada.")
+
+    # Inicializa o app se a credencial foi carregada
+    if cred and not firebase_admin._apps:
+        firebase_admin.initialize_app(cred)
+    else:
+        print("Firebase já inicializado ou credenciais ausentes.")
 
     # --- Registrar Blueprints ---
     from .routes.auth_routes import auth_bp
