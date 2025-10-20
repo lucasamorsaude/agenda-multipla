@@ -4,4 +4,4 @@ datetime
 pandas
 gunicorn
 firebase_admin
-dotoenv
+python-dotenv
