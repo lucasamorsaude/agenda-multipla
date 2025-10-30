@@ -1,3 +1,4 @@
+# update_cache_script.py - VERSÃO CORRIGIDA
 import sys
 import os
 from datetime import date, timedelta, datetime
@@ -97,30 +98,33 @@ def process_and_cache_day(target_date: date, clinic_id: int):
         
         slots = get_slots_for_professional_script(prof_id, target_date, clinic_id, HEADERS)
         
-        if any(slot.get('status') not in ["Livre", "Bloqueado"] for slot in slots):
-            context["agendas"][prof_nome] = {
-                "id": prof_id,
-                "nome": prof_nome,
-                "horarios": sorted(slots, key=lambda x: x.get('numeric_hour', 0.0))
-            }
+        # *** CORREÇÃO AQUI: REMOVA A CONDIÇÃO QUE FILTRA PROFISSIONAIS ***
+        # if any(slot.get('status') not in ["Livre", "Bloqueado"] for slot in slots):
             
-            # --- LÓGICA DE CONTAGEM CORRIGIDA (IGUAL AO MAIN_ROUTES.PY) ---
-            contagem_status = {}
-            for slot in slots:
-                main_status = slot.get('status')
-                app_status = slot.get('appointmentStatus')
-                
-                final_key = main_status
-                if app_status:
-                    if main_status == 'Encaixe':
-                        final_key = f"Encaixe ({app_status})"
-                    else:
-                        final_key = app_status
+        # *** SEMPRE inclui o profissional, mesmo que tenha apenas horários livres ***
+        context["agendas"][prof_nome] = {
+            "id": prof_id,
+            "nome": prof_nome,
+            "horarios": sorted(slots, key=lambda x: x.get('numeric_hour', 0.0))
+        }
+        
+        # --- LÓGICA DE CONTAGEM CORRIGIDA (IGUAL AO MAIN_ROUTES.PY) ---
+        contagem_status = {}
+        for slot in slots:
+            main_status = slot.get('status')
+            app_status = slot.get('appointmentStatus')
+            
+            final_key = main_status
+            if app_status:
+                if main_status == 'Encaixe':
+                    final_key = f"Encaixe ({app_status})"
+                else:
+                    final_key = app_status
 
-                if final_key:
-                    contagem_status[final_key] = contagem_status.get(final_key, 0) + 1
-            
-            context["resumo_geral"][prof_nome] = contagem_status
+            if final_key:
+                contagem_status[final_key] = contagem_status.get(final_key, 0) + 1
+        
+        context["resumo_geral"][prof_nome] = contagem_status
 
     # --- Cálculo de Métricas ---
     if context["resumo_geral"]:

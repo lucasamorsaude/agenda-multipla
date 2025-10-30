@@ -191,22 +191,27 @@
         <div class="horizontal-scroll-container">
             {% if agendas %}
                 {% for profissional, agenda_data in agendas.items() %}
-                <div class="agenda-column">
-                    <div class="card agenda-card">
-                        <div class="card-header agenda-header"><a href="{{ agenda_url_template.format(agenda_data.id, selected_date) }}" target="_blank" class="text-white text-decoration-none">{{ profissional }}</a></div>
-                        <div class="card-body">
-                            {% for slot in agenda_data.horarios %}
-                            <div class="slot" style="{{ status_styles.get(slot.status, status_styles.default) }}" 
-                                 data-bs-toggle="tooltip" data-bs-placement="top" title="Clique para ver detalhes" 
-                                 onclick="fetchDetails('{{ slot.appointmentId }}', '{{ slot.patientId }}')">
-                                <strong>{{ slot.formatedHour }}</strong> - {{ slot.status }}<br>
-                                <small><strong>{{ slot.patient if slot.patient else 'Disponível' }}</strong></small>
+                    {% if agenda_data.horarios %}  <!-- SÓ MOSTRA SE TIVER HORÁRIOS -->
+                    <div class="agenda-column">
+                        <div class="card agenda-card">
+                            <div class="card-header agenda-header">
+                                <a href="{{ agenda_url_template.format(agenda_data.id, selected_date) }}" target="_blank" class="text-white text-decoration-none">{{ profissional }}</a>
                             </div>
-                            {% endfor %}
+                            <div class="card-body">
+                                {% for slot in agenda_data.horarios %}
+                                <div class="slot" style="{{ status_styles.get(slot.status, status_styles.default) }}" 
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Clique para ver detalhes" 
+                                    onclick="fetchDetails('{{ slot.appointmentId }}', '{{ slot.patientId }}')">
+                                    <strong>{{ slot.formatedHour }}</strong> - {{ slot.status }}<br>
+                                    <small><strong>{{ slot.patient if slot.patient else 'Disponível' }}</strong></small>
+                                </div>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
-                </div>
+                    {% endif %}
                 {% endfor %}
+                
             {% else %}
                 <div class="col-12"><div class="alert alert-info">Nenhuma agenda com horários ativos para a data selecionada.</div></div>
             {% endif %}

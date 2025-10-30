@@ -95,35 +95,38 @@ def index():
                 
                 slots = get_slots_for_professional(prof_id, selected_date, id_unidade_selecionada, HEADERS)
                 
-                if any(slot.get('status') not in ["Livre", "Bloqueado"] for slot in slots):
-                    context["agendas"][prof_nome] = {
-                        "id": prof_id,
-                        "nome": prof_nome,
-                        "horarios": sorted(slots, key=lambda x: x.get('numeric_hour', 0.0))
-                    }
+                # REMOVA ESTA CONDIÇÃO PARA INCLUIR TODOS OS PROFISSIONAIS
+                # if any(slot.get('status') not in ["Livre", "Bloqueado"] for slot in slots):
+                
+                # SEMPRE inclui o profissional, mesmo que tenha apenas horários livres
+                context["agendas"][prof_nome] = {
+                    "id": prof_id,
+                    "nome": prof_nome,
+                    "horarios": sorted(slots, key=lambda x: x.get('numeric_hour', 0.0))
+                }
+                
+                # --- LÓGICA DE CONTAGEM ATUALIZADA PARA ENVIAR AMBOS OS STATUS ---
+                contagem_status = {}
+                for slot in slots:
+                    main_status = slot.get('status')
+                    app_status = slot.get('appointmentStatus')
                     
-                    # --- LÓGICA DE CONTAGEM ATUALIZADA PARA ENVIAR AMBOS OS STATUS ---
-                    contagem_status = {}
-                    for slot in slots:
-                        main_status = slot.get('status')
-                        app_status = slot.get('appointmentStatus')
-                        
-                        final_key = main_status # Define o status base
-                        
-                        # Se 'appointmentStatus' existir, ele representa o resultado final da consulta.
-                        # Se o slot for um 'Encaixe', preservamos essa informação.
-                        if app_status:
-                            if main_status == 'Encaixe':
-                                # Cria uma chave combinada, ex: "Encaixe (Atendido)"
-                                final_key = f"Encaixe ({app_status})"
-                            else:
-                                # Para agendamentos normais, o resultado final é o que importa
-                                final_key = app_status
+                    final_key = main_status # Define o status base
+                    
+                    # Se 'appointmentStatus' existir, ele representa o resultado final da consulta.
+                    # Se o slot for um 'Encaixe', preservamos essa informação.
+                    if app_status:
+                        if main_status == 'Encaixe':
+                            # Cria uma chave combinada, ex: "Encaixe (Atendido)"
+                            final_key = f"Encaixe ({app_status})"
+                        else:
+                            # Para agendamentos normais, o resultado final é o que importa
+                            final_key = app_status
 
-                        if final_key:
-                            contagem_status[final_key] = contagem_status.get(final_key, 0) + 1
+                    if final_key:
+                        contagem_status[final_key] = contagem_status.get(final_key, 0) + 1
 
-                    context["resumo_geral"][prof_nome] = contagem_status
+                context["resumo_geral"][prof_nome] = contagem_status
                     
             if context.get("agendas"):
 
